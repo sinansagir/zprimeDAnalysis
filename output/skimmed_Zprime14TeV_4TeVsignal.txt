@@ -1,0 +1,12 @@
+[config-begin]
+	Outputdir  = set_new_output_directory
+	Outputfile = outputfile_RSG4TeV.root
+	Lumi = 3000
+	Maxchilds = 6
+	Samplesdir = output/
+[config-end]
+
+[inputfiles-begin]
+4TeV200PU_10_ntuple.root, 4TeV200PU_1, 1, 1, 197995,1, true 
+4TeV200PU_21_ntuple.root, 4TeV200PU_2, 1, 1, 201995,1, true 
+[inputfiles-end]

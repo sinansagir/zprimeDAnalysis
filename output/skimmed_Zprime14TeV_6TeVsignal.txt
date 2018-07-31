@@ -1,0 +1,23 @@
+[config-begin]
+	Outputdir  = set_new_output_directory
+	Outputfile = outputfile_RSG6TeV.root
+	Lumi = 3000
+	Maxchilds = 13
+	Samplesdir = output/
+[config-end]
+
+[inputfiles-begin]
+6TeV200PU_1_11_ntuple.root, 6TeV200PU_1_1, 1, 1, 4999,1, true 
+6TeV200PU_6_112_ntuple.root, 6TeV200PU_6_1, 1, 1, 18999,1, true 
+6TeV200PU_3_16_ntuple.root, 6TeV200PU_3_1, 1, 1, 18999,1, true 
+6TeV200PU_4_18_ntuple.root, 6TeV200PU_4_1, 1, 1, 18999,1, true 
+6TeV200PU_5_110_ntuple.root, 6TeV200PU_5_1, 1, 1, 18999,1, true 
+6TeV200PU_2_0b2_ntuple.root, 6TeV200PU_2_0b, 1, 1, 24999,1, true 
+6TeV200PU_2_03_ntuple.root, 6TeV200PU_2_0, 1, 1, 24999,1, true 
+6TeV200PU_3_05_ntuple.root, 6TeV200PU_3_0, 1, 1, 49999,1, true 
+6TeV200PU_4_07_ntuple.root, 6TeV200PU_4_0, 1, 1, 49999,1, true 
+6TeV200PU_6_011_ntuple.root, 6TeV200PU_6_0, 1, 1, 49999,1, true 
+6TeV200PU_5_09_ntuple.root, 6TeV200PU_5_0, 1, 1, 49999,1, true 
+6TeV200PU_1_00_ntuple.root, 6TeV200PU_1_0, 1, 1, 49999,1, true 
+6TeV200PU_2_14_ntuple.root, 6TeV200PU_2_1, 1, 1, 18999,1, true 
+[inputfiles-end]
