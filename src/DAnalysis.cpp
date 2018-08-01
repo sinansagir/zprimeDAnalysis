@@ -235,21 +235,6 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 
 		Nvrtx=0;
 		Nvrtx = vrtx.size();
-
-		genzpPt=-999;
-		genzpEta=-999;
-		genzpPhi=-999;
-		genzpMass=-999;
-
-		for (unsigned int i=0;i<genpart.size();i++){
-			if (genpart.at(i)->PID==5100021){
-				genzpPt=genpart.at(i)->PT;
-				genzpEta=genpart.at(i)->Eta;
-				genzpPhi=genpart.at(i)->Phi;
-				genzpMass=genpart.at(i)->Mass;
-				break;
-				}
-			}
 		
 		/*
 		 * Or to fill the skim
@@ -514,6 +499,21 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
       	  //zpDeltaPhi = j0_lv.DeltaPhi(j1_lv);
       	  zpDeltaR = j0_lv.DeltaR(j1_lv);
 		  }
+
+		genzpPt=-999;
+		genzpEta=-999;
+		genzpPhi=-999;
+		genzpMass=-999;
+
+		for (unsigned int i=0;i<genpart.size();i++){
+			if (genpart.at(i)->PID==5100021){
+				genzpPt=genpart.at(i)->PT;
+				genzpEta=genpart.at(i)->Eta;
+				genzpPhi=genpart.at(i)->Phi;
+				genzpMass=genpart.at(i)->Mass;
+				break;
+				}
+			}
 
 		myskim->Fill();
 

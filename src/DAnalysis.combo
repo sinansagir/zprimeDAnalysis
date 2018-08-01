@@ -144,10 +144,16 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	std::vector<Double_t> genjetAK8Mass;
 	
 	Double_t zpPt=-999;
+	Double_t zpEta=-999;
+	Double_t zpPhi=-999;
 	Double_t zpMass=-999;
 	Double_t zpDeltaY=-999;
 	//Double_t zpDeltaPhi=-999;
 	Double_t zpDeltaR=-999;
+	Double_t genzpPt=-999;
+	Double_t genzpEta=-999;
+	Double_t genzpPhi=-999;
+	Double_t genzpMass=-999;
 	TLorentzVector lepton_lv,j0_lv,j1_lv,zp_lv,W_lv,W_lv_r1,W_lv_r2,nu_lv1,nu_lv2,b_lv;
 	
 	myskim->Branch("Nvrtx", &Nvrtx);
@@ -183,10 +189,16 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	myskim->Branch("jetAK8SDMass", &jetAK8SDMass);
 	myskim->Branch("jetAK8BTag", &jetAK8BTag);
 	myskim->Branch("zpPt", &zpPt);
+	myskim->Branch("zpEta", &zpEta);
+	myskim->Branch("zpPhi", &zpPhi);
 	myskim->Branch("zpMass", &zpMass);
 	myskim->Branch("zpDeltaY", &zpDeltaY);
 	//myskim->Branch("zpDeltaPhi", &zpDeltaPhi);
 	myskim->Branch("zpDeltaR", &zpDeltaR);
+	myskim->Branch("genzpPt", &genzpPt);
+	myskim->Branch("genzpEta", &genzpEta);
+	myskim->Branch("genzpPhi", &genzpPhi);
+	myskim->Branch("genzpMass", &genzpMass);
 	myskim->Branch("genjetPt", &genjetPt);
 	myskim->Branch("genjetEta", &genjetEta);
 	myskim->Branch("genjetPhi", &genjetPhi);
@@ -223,7 +235,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 
 		Nvrtx=0;
 		Nvrtx = vrtx.size();
-
+		
 		/*
 		 * Or to fill the skim
 		 */
@@ -331,7 +343,8 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 			jetAK8BTag.push_back(jetAK8.at(ijet)->BTag);
 			NAK8jets++;
 			}
-
+		if(NAK8jets<2){isAllHad=false;}
+		
 		genjetPt.clear();
 		genjetEta.clear();
 		genjetPhi.clear();
@@ -354,22 +367,12 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 			}
 		
 		zpPt=-999;
+		zpEta=-999;
+		zpPhi=-999;
 		zpMass=-999;
 		zpDeltaY=-999;
 		//zpDeltaPhi=-999;
 		zpDeltaR=-999;
-		if(isAllHad && NAK8jets>1){ //All-had reconstruction
-	      j0_lv.SetPtEtaPhiM(jetAK8Pt.at(0),jetAK8Eta.at(0),jetAK8Phi.at(0),jetAK8Mass.at(0));
-		  j1_lv.SetPtEtaPhiM(jetAK8Pt.at(1),jetAK8Eta.at(1),jetAK8Phi.at(1),jetAK8Mass.at(1));
-		  zp_lv = j0_lv+j1_lv;
-      	  Double_t j0_rap = 0.5*log((j0_lv.E()+j0_lv.P())/(j0_lv.E()-j0_lv.P()));
-      	  Double_t j1_rap = 0.5*log((j1_lv.E()+j1_lv.P())/(j1_lv.E()-j1_lv.P()));
-      	  zpPt = zp_lv.Pt();
-      	  zpMass = zp_lv.M();
-      	  zpDeltaY = fabs(j0_rap-j1_rap);
-      	  //zpDeltaPhi = j0_lv.DeltaPhi(j1_lv);
-      	  zpDeltaR = j0_lv.DeltaR(j1_lv);
-		  }
 
 		if((isSingEl || isSingMu) && Njets>0 && NAK8jets>0){ //Single-lepton reconstruction
 	      j0_lv.SetPtEtaPhiM(jetAK8Pt.at(0),jetAK8Eta.at(0),jetAK8Phi.at(0),jetAK8Mass.at(0));
@@ -460,20 +463,57 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
           else{W_lv = W_lv_r2;}
           
           if(bIndex<0){
-          	std::cout<<"No b-jet was found near leptonic W! Continuing ..."<<std::endl;
+          	std::cout<<"No b-jet was found near leptonic W! Setting isSingEl and isSingMu=false!"<<std::endl;
+          	isSingEl=false;
+          	isSingMu=false;
+          	if(NAK8jets>1){isAllHad=true; std::cout<<"======> There are 2 or more AK8 jets, setting isAllHad=false!"<<std::endl;} //If single-lepton mass cannot be reconstructed, try assigning event to all-hadronic!
           }else{
             b_lv.SetPtEtaPhiM(jetPt.at(bIndex),jetEta.at(bIndex),jetPhi.at(bIndex),jetMass.at(bIndex));
             j1_lv = W_lv+b_lv; //Leptonic top LV
 		    zp_lv = j0_lv+j1_lv;
-      	    Double_t j0_rap = 0.5*log((j0_lv.E()+j0_lv.P())/(j0_lv.E()-j0_lv.P()));
-      	    Double_t j1_rap = 0.5*log((j1_lv.E()+j1_lv.P())/(j1_lv.E()-j1_lv.P()));
+      	    //Double_t j0_rap = 0.5*log((j0_lv.E()+j0_lv.P())/(j0_lv.E()-j0_lv.P()));
+      	    //Double_t j1_rap = 0.5*log((j1_lv.E()+j1_lv.P())/(j1_lv.E()-j1_lv.P()));
       	    zpPt = zp_lv.Pt();
+      	  	zpEta = zp_lv.Eta();
+      	  	zpPhi = zp_lv.Phi();
       	    zpMass = zp_lv.M();
-      	    zpDeltaY = fabs(j0_rap-j1_rap);
+      	    //zpDeltaY = fabs(j0_rap-j1_rap);
+      	    zpDeltaY = fabs(j0_lv.Rapidity()-j1_lv.Rapidity());
       	    //zpDeltaPhi = j0_lv.DeltaPhi(j1_lv);
       	    zpDeltaR = j0_lv.DeltaR(j1_lv);
       	    }
 		  }
+		
+		if(isAllHad){ //All-had reconstruction
+	      j0_lv.SetPtEtaPhiM(jetAK8Pt.at(0),jetAK8Eta.at(0),jetAK8Phi.at(0),jetAK8Mass.at(0));
+		  j1_lv.SetPtEtaPhiM(jetAK8Pt.at(1),jetAK8Eta.at(1),jetAK8Phi.at(1),jetAK8Mass.at(1));
+		  zp_lv = j0_lv+j1_lv;
+      	  //Double_t j0_rap = 0.5*log((j0_lv.E()+j0_lv.P())/(j0_lv.E()-j0_lv.P()));
+      	  //Double_t j1_rap = 0.5*log((j1_lv.E()+j1_lv.P())/(j1_lv.E()-j1_lv.P()));
+      	  zpPt = zp_lv.Pt();
+      	  zpEta = zp_lv.Eta();
+      	  zpPhi = zp_lv.Phi();
+      	  zpMass = zp_lv.M();
+      	  //zpDeltaY = fabs(j0_rap-j1_rap);
+      	  zpDeltaY = fabs(j0_lv.Rapidity()-j1_lv.Rapidity());
+      	  //zpDeltaPhi = j0_lv.DeltaPhi(j1_lv);
+      	  zpDeltaR = j0_lv.DeltaR(j1_lv);
+		  }
+
+		genzpPt=-999;
+		genzpEta=-999;
+		genzpPhi=-999;
+		genzpMass=-999;
+
+		for (unsigned int i=0;i<genpart.size();i++){
+			if (genpart.at(i)->PID==5100021){
+				genzpPt=genpart.at(i)->PT;
+				genzpEta=genpart.at(i)->Eta;
+				genzpPhi=genpart.at(i)->Phi;
+				genzpMass=genpart.at(i)->Mass;
+				break;
+				}
+			}
 
 		myskim->Fill();
 
