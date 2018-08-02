@@ -94,7 +94,6 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	/*
 	 * Add a simple branch to the skim
 	 */
-	Int_t Nvrtx=0;
 	
 	Bool_t isSingEl=false;
 	Bool_t isSingMu=false;
@@ -108,47 +107,49 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	Double_t lepEta=-999;
 	Double_t lepPhi=-999;
 
-// 	std::vector<Double_t> elPt;
-// 	std::vector<Double_t> elEta;
-// 	std::vector<Double_t> elPhi;
-// 	
-// 	std::vector<Double_t> muPt;
-// 	std::vector<Double_t> muEta;
-// 	std::vector<Double_t> muPhi;
-
-// 	Int_t Njets=0;
 	std::vector<Double_t> jetPt;
 	std::vector<Double_t> jetEta;
 	std::vector<Double_t> jetPhi;
 	std::vector<Double_t> jetMass;
 	std::vector<Double_t> jetBTag;
-	
-// 	Int_t NAK8jets=0;
+
+	Double_t topBjetPt =-999;
+	Double_t topBjetEta=-999;
+	Double_t topBjetPhi=-999;
+	Double_t topBjetMass=-999;
+	Double_t topBjetBTag=-999;
+
+	Double_t recWPt;
+	Double_t recWEta;
+	Double_t recWPhi;
+	Double_t recWMass;
+
+	Double_t rectopPt;
+	Double_t rectopEta;
+	Double_t rectopPhi;
+	Double_t rectopMass;
+
 	std::vector<Double_t> jetAK8Pt;
 	std::vector<Double_t> jetAK8Eta;
 	std::vector<Double_t> jetAK8Phi;
 	std::vector<Double_t> jetAK8Mass;
-	std::vector<Double_t> jetAK8Tau1;
-	std::vector<Double_t> jetAK8Tau2;
-	std::vector<Double_t> jetAK8Tau3;
+	std::vector<Double_t> jetAK8Tau32;
 	std::vector<Double_t> jetAK8SDMass;
 	std::vector<Double_t> jetAK8BTag;
-
-	std::vector<Double_t> genjetPt;
-	std::vector<Double_t> genjetEta;
-	std::vector<Double_t> genjetPhi;
-	std::vector<Double_t> genjetMass;
-	std::vector<Double_t> genjetAK8Pt;
-	std::vector<Double_t> genjetAK8Eta;
-	std::vector<Double_t> genjetAK8Phi;
-	std::vector<Double_t> genjetAK8Mass;
+	
+	Double_t topAK8Pt;
+	Double_t topAK8Eta;
+	Double_t topAK8Phi;
+	Double_t topAK8Mass;
+	Double_t topAK8Tau32;
+	Double_t topAK8SDMass;
+	Double_t topAK8BTag;
 	
 	Double_t zpPt=-999;
 	Double_t zpEta=-999;
 	Double_t zpPhi=-999;
 	Double_t zpMass=-999;
 	Double_t zpDeltaY=-999;
-	//Double_t zpDeltaPhi=-999;
 	Double_t zpDeltaR=-999;
 	Double_t genzpPt=-999;
 	Double_t genzpEta=-999;
@@ -156,57 +157,45 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	Double_t genzpMass=-999;
 	TLorentzVector lepton_lv,j0_lv,j1_lv,zp_lv,W_lv,W_lv_r1,W_lv_r2,nu_lv1,nu_lv2,b_lv;
 	
-	myskim->Branch("Nvrtx", &Nvrtx);
 	myskim->Branch("isSingEl", &isSingEl);
 	myskim->Branch("isSingMu", &isSingMu);
-	myskim->Branch("isAllHad", &isAllHad);
 	myskim->Branch("lepPt", &lepPt);
 	myskim->Branch("lepEta", &lepEta);
 	myskim->Branch("lepPhi", &lepPhi);
-// 	myskim->Branch("elPt", &elPt);
-// 	myskim->Branch("elEta", &elEta);
-// 	myskim->Branch("elPhi", &elPhi);
-// 	myskim->Branch("muPt", &muPt);
-// 	myskim->Branch("muEta", &muEta);
-// 	myskim->Branch("muPhi", &muPhi);
 	myskim->Branch("metPt", &metPt);
 	myskim->Branch("metEta", &metEta);
 	myskim->Branch("metPhi", &metPhi);
-// 	myskim->Branch("Njets", &Njets);
-	myskim->Branch("jetPt", &jetPt);
-	myskim->Branch("jetEta", &jetEta);
-	myskim->Branch("jetPhi", &jetPhi);
-	myskim->Branch("jetMass", &jetMass);
 	myskim->Branch("jetBTag", &jetBTag);
-// 	myskim->Branch("NAK8jets", &NAK8jets);
-	myskim->Branch("jetAK8Pt", &jetAK8Pt);
-	myskim->Branch("jetAK8Eta", &jetAK8Eta);
-	myskim->Branch("jetAK8Phi", &jetAK8Phi);
-	myskim->Branch("jetAK8Mass", &jetAK8Mass);
-	myskim->Branch("jetAK8Tau1", &jetAK8Tau1);
-	myskim->Branch("jetAK8Tau2", &jetAK8Tau2);
-	myskim->Branch("jetAK8Tau3", &jetAK8Tau3);
-	myskim->Branch("jetAK8SDMass", &jetAK8SDMass);
-	myskim->Branch("jetAK8BTag", &jetAK8BTag);
+	myskim->Branch("topBjetPt", &topBjetPt);
+	myskim->Branch("topBjetEta", &topBjetEta);
+	myskim->Branch("topBjetPhi", &topBjetPhi);
+	myskim->Branch("topBjetMass", &topBjetMass);
+	myskim->Branch("topBjetBTag", &topBjetBTag);
+	myskim->Branch("recWPt", &recWPt);
+	myskim->Branch("recWEta", &recWEta);
+	myskim->Branch("recWPhi", &recWPhi);
+	myskim->Branch("recWMass", &recWMass);
+	myskim->Branch("rectopPt", &rectopPt);
+	myskim->Branch("rectopEta", &rectopEta);
+	myskim->Branch("rectopPhi", &rectopPhi);
+	myskim->Branch("rectopMass", &rectopMass);
+	myskim->Branch("topAK8Pt", &topAK8Pt);
+	myskim->Branch("topAK8Eta", &topAK8Eta);
+	myskim->Branch("topAK8Phi", &topAK8Phi);
+	myskim->Branch("topAK8Mass", &topAK8Mass);
+	myskim->Branch("topAK8Tau32", &topAK8Tau32);
+	myskim->Branch("topAK8SDMass", &topAK8SDMass);
+	myskim->Branch("topAK8BTag", &topAK8BTag);
 	myskim->Branch("zpPt", &zpPt);
 	myskim->Branch("zpEta", &zpEta);
 	myskim->Branch("zpPhi", &zpPhi);
 	myskim->Branch("zpMass", &zpMass);
 	myskim->Branch("zpDeltaY", &zpDeltaY);
-	//myskim->Branch("zpDeltaPhi", &zpDeltaPhi);
 	myskim->Branch("zpDeltaR", &zpDeltaR);
 	myskim->Branch("genzpPt", &genzpPt);
 	myskim->Branch("genzpEta", &genzpEta);
 	myskim->Branch("genzpPhi", &genzpPhi);
 	myskim->Branch("genzpMass", &genzpMass);
-	myskim->Branch("genjetPt", &genjetPt);
-	myskim->Branch("genjetEta", &genjetEta);
-	myskim->Branch("genjetPhi", &genjetPhi);
-	myskim->Branch("genjetMass", &genjetMass);
-	myskim->Branch("genjetAK8Pt", &genjetAK8Pt);
-	myskim->Branch("genjetAK8Eta", &genjetAK8Eta);
-	myskim->Branch("genjetAK8Phi", &genjetAK8Phi);
-	myskim->Branch("genjetAK8Mass", &genjetAK8Mass);
 	/*
 	 * Or store a vector of objects (also possible to store only one object)
 	 */
@@ -232,44 +221,29 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		/*
 		 * Begin the event-by-event analysis
 		 */
-
-		Nvrtx=0;
-		Nvrtx = vrtx.size();
 		
 		/*
 		 * Or to fill the skim
 		 */
 		//skimmedelecs.clear();
-// 		elPt.clear();
-// 		elEta.clear();
-// 		elPhi.clear();
 		Int_t Nels = 0;
 		Int_t elIdx = 0;
 		for(size_t iel=0;iel<elecs.size();iel++){
 			//flat info
 			if(elecs.at(iel)->PT < 20) continue;
 			if(fabs(elecs.at(iel)->Eta) > 2.4) continue;
-// 			elPt.push_back(elecs.at(iel)->PT);
-// 			elEta.push_back(elecs.at(iel)->Eta);
-// 			elPhi.push_back(elecs.at(iel)->Phi);
 			Nels++;
 			elIdx=iel;
 			//or objects
 			//skimmedelecs.push_back(*elecs.at(i));
 			}
 
-// 		muPt.clear();
-// 		muEta.clear();
-// 		muPhi.clear();
 		Int_t Nmus = 0;
 		Int_t muIdx = 0;
 		for(size_t imu=0;imu<muontight.size();imu++){
 			//flat info
 			if(muontight.at(imu)->PT < 20) continue;
 			if(fabs(muontight.at(imu)->Eta) > 2.4) continue;
-// 			muPt.push_back(muontight.at(imu)->PT);
-// 			muEta.push_back(muontight.at(imu)->Eta);
-// 			muPhi.push_back(muontight.at(imu)->Phi);
 			Nmus++;
 			muIdx=imu;
 			}
@@ -323,9 +297,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		jetAK8Eta.clear();
 		jetAK8Phi.clear();
 		jetAK8Mass.clear();
-		jetAK8Tau1.clear();
-		jetAK8Tau2.clear();
-		jetAK8Tau3.clear();
+		jetAK8Tau32.clear();
 		jetAK8SDMass.clear();
 		jetAK8BTag.clear();
 		for(size_t ijet=0;ijet<jetAK8.size();ijet++){
@@ -336,46 +308,34 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 			jetAK8Eta.push_back(jetAK8.at(ijet)->Eta);
 			jetAK8Phi.push_back(jetAK8.at(ijet)->Phi);
 			jetAK8Mass.push_back(jetAK8.at(ijet)->Mass);
-			jetAK8Tau1.push_back(jetAK8.at(ijet)->Tau[0]);
-			jetAK8Tau2.push_back(jetAK8.at(ijet)->Tau[1]);
-			jetAK8Tau3.push_back(jetAK8.at(ijet)->Tau[2]);
+			jetAK8Tau32.push_back(jetAK8.at(ijet)->Tau[2]/jetAK8.at(ijet)->Tau[1]);
 			jetAK8SDMass.push_back(jetAK8.at(ijet)->SoftDroppedJet.M());
 			jetAK8BTag.push_back(jetAK8.at(ijet)->BTag);
 			NAK8jets++;
 			}
-		if(NAK8jets<2){isAllHad=false;}
-		
-		genjetPt.clear();
-		genjetEta.clear();
-		genjetPhi.clear();
-		genjetMass.clear();
-		for(size_t ijet=0;ijet<genjet.size();ijet++){
-			genjetPt.push_back(genjet.at(ijet)->PT);
-			genjetEta.push_back(genjet.at(ijet)->Eta);
-			genjetPhi.push_back(genjet.at(ijet)->Phi);
-			genjetMass.push_back(genjet.at(ijet)->Mass);
-			}
-		genjetAK8Pt.clear();
-		genjetAK8Eta.clear();
-		genjetAK8Phi.clear();
-		genjetAK8Mass.clear();
-		for(size_t ijet=0;ijet<genjetAK8.size();ijet++){
-			genjetAK8Pt.push_back(genjetAK8.at(ijet)->PT);
-			genjetAK8Eta.push_back(genjetAK8.at(ijet)->Eta);
-			genjetAK8Phi.push_back(genjetAK8.at(ijet)->Phi);
-			genjetAK8Mass.push_back(genjetAK8.at(ijet)->Mass);
-			}
-		
+		if(NAK8jets>1){isAllHad=true;}
+		if(!((isSingEl || isSingMu) && !isAllHad && Njets>0 && NAK8jets>0)) continue;
+
 		zpPt=-999;
 		zpEta=-999;
 		zpPhi=-999;
 		zpMass=-999;
 		zpDeltaY=-999;
-		//zpDeltaPhi=-999;
 		zpDeltaR=-999;
-
-		if((isSingEl || isSingMu) && Njets>0 && NAK8jets>0){ //Single-lepton reconstruction
-	      j0_lv.SetPtEtaPhiM(jetAK8Pt.at(0),jetAK8Eta.at(0),jetAK8Phi.at(0),jetAK8Mass.at(0));
+		
+		topBjetPt=-999;
+		topBjetEta=-999;
+		topBjetPhi=-999;
+		topBjetMass=-999;
+		topBjetBTag=-999;
+		recWPt=-999;
+		recWEta=-999;
+		recWPhi=-999;
+		recWMass=-999;
+		rectopPt=-999;
+		rectopEta=-999;
+		rectopPhi=-999;
+		rectopMass=-999;
 	      
           // ----------------------------------------------------------------------------
           // W --> l nu with mass constraint
@@ -433,6 +393,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
       	  // top --> W b --> l nu b using W from above
           // ----------------------------------------------------------------------------
           
+	      j0_lv.SetPtEtaPhiM(jetAK8Pt.at(0),jetAK8Eta.at(0),jetAK8Phi.at(0),jetAK8Mass.at(0));
           Double_t dMTOP = 1e8;
           Int_t bIndex = -1;
           Bool_t firstW = true;
@@ -462,42 +423,44 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
           if(firstW) {W_lv = W_lv_r1;}
           else{W_lv = W_lv_r2;}
           
-          if(bIndex<0){
-          	std::cout<<"No b-jet was found near leptonic W! Setting isSingEl and isSingMu=false!"<<std::endl;
-          	isSingEl=false;
-          	isSingMu=false;
-          	if(NAK8jets>1){isAllHad=true; std::cout<<"======> There are 2 or more AK8 jets, setting isAllHad=false!"<<std::endl;} //If single-lepton mass cannot be reconstructed, try assigning event to all-hadronic!
-          }else{
+          if(bIndex>=0){
             b_lv.SetPtEtaPhiM(jetPt.at(bIndex),jetEta.at(bIndex),jetPhi.at(bIndex),jetMass.at(bIndex));
             j1_lv = W_lv+b_lv; //Leptonic top LV
 		    zp_lv = j0_lv+j1_lv;
-      	    //Double_t j0_rap = 0.5*log((j0_lv.E()+j0_lv.P())/(j0_lv.E()-j0_lv.P()));
-      	    //Double_t j1_rap = 0.5*log((j1_lv.E()+j1_lv.P())/(j1_lv.E()-j1_lv.P()));
+
       	    zpPt = zp_lv.Pt();
       	  	zpEta = zp_lv.Eta();
       	  	zpPhi = zp_lv.Phi();
       	    zpMass = zp_lv.M();
-      	    //zpDeltaY = fabs(j0_rap-j1_rap);
       	    zpDeltaY = fabs(j0_lv.Rapidity()-j1_lv.Rapidity());
-      	    //zpDeltaPhi = j0_lv.DeltaPhi(j1_lv);
       	    zpDeltaR = j0_lv.DeltaR(j1_lv);
-      	    }
-		  }
-		
-		if(isAllHad){ //All-had reconstruction
-	      j0_lv.SetPtEtaPhiM(jetAK8Pt.at(0),jetAK8Eta.at(0),jetAK8Phi.at(0),jetAK8Mass.at(0));
-		  j1_lv.SetPtEtaPhiM(jetAK8Pt.at(1),jetAK8Eta.at(1),jetAK8Phi.at(1),jetAK8Mass.at(1));
-		  zp_lv = j0_lv+j1_lv;
-      	  //Double_t j0_rap = 0.5*log((j0_lv.E()+j0_lv.P())/(j0_lv.E()-j0_lv.P()));
-      	  //Double_t j1_rap = 0.5*log((j1_lv.E()+j1_lv.P())/(j1_lv.E()-j1_lv.P()));
-      	  zpPt = zp_lv.Pt();
-      	  zpEta = zp_lv.Eta();
-      	  zpPhi = zp_lv.Phi();
-      	  zpMass = zp_lv.M();
-      	  //zpDeltaY = fabs(j0_rap-j1_rap);
-      	  zpDeltaY = fabs(j0_lv.Rapidity()-j1_lv.Rapidity());
-      	  //zpDeltaPhi = j0_lv.DeltaPhi(j1_lv);
-      	  zpDeltaR = j0_lv.DeltaR(j1_lv);
+
+			topBjetPt=jetPt.at(bIndex);
+			topBjetEta=jetEta.at(bIndex);
+			topBjetPhi=jetPhi.at(bIndex);
+			topBjetMass=jetMass.at(bIndex);
+			topBjetBTag=jetBTag.at(bIndex);
+
+      	    recWPt = W_lv.Pt();
+      	  	recWEta = W_lv.Eta();
+      	  	recWPhi = W_lv.Phi();
+      	    recWMass = W_lv.M();
+
+      	    rectopPt = j1_lv.Pt();
+      	  	rectopEta = j1_lv.Eta();
+      	  	rectopPhi = j1_lv.Phi();
+      	    rectopMass = j1_lv.M();
+
+			topAK8Pt=jetAK8Pt.at(0);
+			topAK8Eta=jetAK8Eta.at(0);
+			topAK8Phi=jetAK8Phi.at(0);
+			topAK8Mass=jetAK8Mass.at(0);
+			topAK8Tau32=jetAK8Tau32.at(0);
+			topAK8SDMass=jetAK8SDMass.at(0);
+			topAK8BTag=jetAK8BTag.at(0);
+          }else{
+          	std::cout<<"No b-jet was found near leptonic W! Continuing ..."<<std::endl;
+          	continue;
 		  }
 
 		genzpPt=-999;

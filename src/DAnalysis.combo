@@ -122,6 +122,22 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	std::vector<Double_t> jetPhi;
 	std::vector<Double_t> jetMass;
 	std::vector<Double_t> jetBTag;
+
+	Double_t topBjetPt =-999;
+	Double_t topBjetEta=-999;
+	Double_t topBjetPhi=-999;
+	Double_t topBjetMass=-999;
+	Double_t topBjetBTag=-999;
+
+	Double_t recWPt;
+	Double_t recWEta;
+	Double_t recWPhi;
+	Double_t recWMass;
+
+	Double_t rectopPt;
+	Double_t rectopEta;
+	Double_t rectopPhi;
+	Double_t rectopMass;
 	
 // 	Int_t NAK8jets=0;
 	std::vector<Double_t> jetAK8Pt;
@@ -178,6 +194,19 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	myskim->Branch("jetPhi", &jetPhi);
 	myskim->Branch("jetMass", &jetMass);
 	myskim->Branch("jetBTag", &jetBTag);
+	myskim->Branch("topBjetPt", &topBjetPt);
+	myskim->Branch("topBjetEta", &topBjetEta);
+	myskim->Branch("topBjetPhi", &topBjetPhi);
+	myskim->Branch("topBjetMass", &topBjetMass);
+	myskim->Branch("topBjetBTag", &topBjetBTag);
+	myskim->Branch("recWPt", &recWPt);
+	myskim->Branch("recWEta", &recWEta);
+	myskim->Branch("recWPhi", &recWPhi);
+	myskim->Branch("recWMass", &recWMass);
+	myskim->Branch("rectopPt", &rectopPt);
+	myskim->Branch("rectopEta", &rectopEta);
+	myskim->Branch("rectopPhi", &rectopPhi);
+	myskim->Branch("rectopMass", &rectopMass);
 // 	myskim->Branch("NAK8jets", &NAK8jets);
 	myskim->Branch("jetAK8Pt", &jetAK8Pt);
 	myskim->Branch("jetAK8Eta", &jetAK8Eta);
@@ -373,6 +402,20 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		zpDeltaY=-999;
 		//zpDeltaPhi=-999;
 		zpDeltaR=-999;
+		
+		topBjetPt=-999;
+		topBjetEta=-999;
+		topBjetPhi=-999;
+		topBjetMass=-999;
+		topBjetBTag=-999;
+		recWPt=-999;
+		recWEta=-999;
+		recWPhi=-999;
+		recWMass=-999;
+		rectopPt=-999;
+		rectopEta=-999;
+		rectopPhi=-999;
+		rectopMass=-999;
 
 		if((isSingEl || isSingMu) && Njets>0 && NAK8jets>0){ //Single-lepton reconstruction
 	      j0_lv.SetPtEtaPhiM(jetAK8Pt.at(0),jetAK8Eta.at(0),jetAK8Phi.at(0),jetAK8Mass.at(0));
@@ -481,6 +524,22 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
       	    zpDeltaY = fabs(j0_lv.Rapidity()-j1_lv.Rapidity());
       	    //zpDeltaPhi = j0_lv.DeltaPhi(j1_lv);
       	    zpDeltaR = j0_lv.DeltaR(j1_lv);
+
+			topBjetPt=jetPt.at(bIndex);
+			topBjetEta=jetEta.at(bIndex);
+			topBjetPhi=jetPhi.at(bIndex);
+			topBjetMass=jetMass.at(bIndex);
+			topBjetBTag=jetBTag.at(bIndex);
+
+      	    recWPt = W_lv.Pt();
+      	  	recWEta = W_lv.Eta();
+      	  	recWPhi = W_lv.Phi();
+      	    recWMass = W_lv.M();
+
+      	    rectopPt = j1_lv.Pt();
+      	  	rectopEta = j1_lv.Eta();
+      	  	rectopPhi = j1_lv.Phi();
+      	    rectopMass = j1_lv.M();
       	    }
 		  }
 		
