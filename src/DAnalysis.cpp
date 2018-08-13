@@ -8,7 +8,16 @@
 #include "interface/DAnalysis.h"
 
 const double MTOP  = 172.5;
-const double MW    = 80.4; 
+const double MW    = 80.4;
+const double Mtlep_mean_0t_  = 175.;
+const double Mtlep_sigma_0t_ = 19.;
+const double Mthad_mean_0t_  = 177.;
+const double Mthad_sigma_0t_ = 16.;
+
+const double Mtlep_mean_1t_  = 175.;
+const double Mtlep_sigma_1t_ = 19.;
+const double Mthad_mean_1t_  = 173.;
+const double Mthad_sigma_1t_ = 15.;
 
 void DAnalysis::analyze(size_t childid /* this info can be used for printouts */){
 
@@ -46,18 +55,18 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	d_ana::dBranchHandler<HepMCEvent>  event(tree(),"Event");
 	//d_ana::dBranchHandler<Weight>      weights(tree(),"Weight");
 	d_ana::dBranchHandler<GenParticle> genpart(tree(),"Particle");
-	d_ana::dBranchHandler<Jet>         genjet(tree(),"GenJet");
-	d_ana::dBranchHandler<Jet>         jet(tree(),"Jet");
+	//d_ana::dBranchHandler<Jet>         genjet(tree(),"GenJet");
+	d_ana::dBranchHandler<Jet>         jet(tree(),"JetPUPPI");
 	d_ana::dBranchHandler<Muon>        muontight(tree(),"MuonTight");
 	//d_ana::dBranchHandler<Photon>      photon(tree(),"Photon");
 	d_ana::dBranchHandler<MissingET>   met(tree(),"MissingET");
-	d_ana::dBranchHandler<Vertex>      vrtx(tree(),"Vertex");
+	//d_ana::dBranchHandler<Vertex>      vrtx(tree(),"Vertex");
 
 // 	TString jetCollection = "";
 // 	if(getSampleFile().Contains("_0PU")) {jetCollection = "JetAK8";}
 // 	else {jetCollection = "JetPUPPIAK8";}
 	d_ana::dBranchHandler<Jet> jetAK8(tree(),"JetPUPPIAK8");
-	d_ana::dBranchHandler<Jet> genjetAK8(tree(),"GenJetAK8");
+	//d_ana::dBranchHandler<Jet> genjetAK8(tree(),"GenJetAK8");
 	//std::cout<<"jetCollection="<<jetCollection<<", FName="<<getSampleFile()<<std::endl;
 
 	/* ==SKIM==
@@ -97,7 +106,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	
 	Bool_t isSingEl=false;
 	Bool_t isSingMu=false;
-	Bool_t isAllHad=false;
+	//Bool_t isAllHad=false;
 	
 	Double_t metPt =-999;
 	Double_t metEta=-999;
@@ -106,28 +115,51 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	Double_t lepPt =-999;
 	Double_t lepEta=-999;
 	Double_t lepPhi=-999;
+	Double_t lepRelIso=-999;
+	
+	Double_t leadJetPt=-999;
+	Double_t leadJetEta=-999;
+	Double_t leadJetPhi=-999;
+	Double_t leadJetMass=-999;
+	Int_t leadJetBTag=0;
+	Double_t subLeadJetPt=-999;
+	Double_t subLeadJetEta=-999;
+	Double_t subLeadJetPhi=-999;
+	Double_t subLeadJetMass=-999;
+	Int_t subLeadJetBTag=0;
 
-	std::vector<Double_t> jetPt;
-	std::vector<Double_t> jetEta;
-	std::vector<Double_t> jetPhi;
-	std::vector<Double_t> jetMass;
-	std::vector<Double_t> jetBTag;
+// 	std::vector<Double_t> jetPt;
+// 	std::vector<Double_t> jetEta;
+// 	std::vector<Double_t> jetPhi;
+// 	std::vector<Double_t> jetMass;
+// 	std::vector<Int_t> jetBTag;
+	std::vector<Double_t> deltaR_ljets;
 
-	Double_t topBjetPt =-999;
-	Double_t topBjetEta=-999;
-	Double_t topBjetPhi=-999;
-	Double_t topBjetMass=-999;
-	Double_t topBjetBTag=-999;
+	Double_t tlepLeadAK4Pt=-999;
+	Double_t tlepLeadAK4Eta=-999;
+	Double_t tlepLeadAK4Phi=-999;
+	Double_t tlepLeadAK4Mass=-999;
+	Int_t tlepLeadAK4BTag=0;
+	Int_t NJetsSel=0;
+	
+	Double_t minDR_lepJet=999;
+	Double_t ptRel_lepJet=-999;
 
-	Double_t recWPt;
-	Double_t recWEta;
-	Double_t recWPhi;
-	Double_t recWMass;
+	Double_t WlepPt=-999;
+	Double_t WlepEta=-999;
+	Double_t WlepPhi=-999;
+	Double_t WlepMass=-999;
 
-	Double_t rectopPt;
-	Double_t rectopEta;
-	Double_t rectopPhi;
-	Double_t rectopMass;
+	Double_t thadPt=-999;
+	Double_t thadEta=-999;
+	Double_t thadPhi=-999;
+	Double_t thadMass=-999;
+	Double_t thadChi2=-999;
+	Double_t tlepPt=-999;
+	Double_t tlepEta=-999;
+	Double_t tlepPhi=-999;
+	Double_t tlepMass=-999;
+	Double_t tlepChi2=-999;
 
 	std::vector<Double_t> jetAK8Pt;
 	std::vector<Double_t> jetAK8Eta;
@@ -135,15 +167,16 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	std::vector<Double_t> jetAK8Mass;
 	std::vector<Double_t> jetAK8Tau32;
 	std::vector<Double_t> jetAK8SDMass;
-	std::vector<Double_t> jetAK8BTag;
+	std::vector<Int_t> jetAK8BTag;
 	
-	Double_t topAK8Pt;
-	Double_t topAK8Eta;
-	Double_t topAK8Phi;
-	Double_t topAK8Mass;
-	Double_t topAK8Tau32;
-	Double_t topAK8SDMass;
-	Double_t topAK8BTag;
+	Double_t topAK8Pt=-999;
+	Double_t topAK8Eta=-999;
+	Double_t topAK8Phi=-999;
+	Double_t topAK8Mass=-999;
+	Double_t topAK8Tau32=-999;
+	Double_t topAK8SDMass=-999;
+	Int_t topAK8BTag=0;
+	Int_t Ntoptagged=0;
 	
 	Double_t zpPt=-999;
 	Double_t zpEta=-999;
@@ -151,34 +184,58 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	Double_t zpMass=-999;
 	Double_t zpDeltaY=-999;
 	Double_t zpDeltaR=-999;
-	Double_t genzpPt=-999;
-	Double_t genzpEta=-999;
-	Double_t genzpPhi=-999;
+	//Double_t genzpPt=-999;
+	//Double_t genzpEta=-999;
+	//Double_t genzpPhi=-999;
 	Double_t genzpMass=-999;
 	TLorentzVector lepton_lv,j0_lv,j1_lv,zp_lv,W_lv,W_lv_r1,W_lv_r2,nu_lv1,nu_lv2,b_lv;
+
+// 	std::vector<TLorentzVector> genTopP4;
+// 	std::vector<Int_t> genTopID;
+// 	Double_t genTTBarMass=-999;
 	
 	myskim->Branch("isSingEl", &isSingEl);
 	myskim->Branch("isSingMu", &isSingMu);
 	myskim->Branch("lepPt", &lepPt);
 	myskim->Branch("lepEta", &lepEta);
 	myskim->Branch("lepPhi", &lepPhi);
+	myskim->Branch("lepRelIso", &lepRelIso);
 	myskim->Branch("metPt", &metPt);
 	myskim->Branch("metEta", &metEta);
 	myskim->Branch("metPhi", &metPhi);
-	myskim->Branch("jetBTag", &jetBTag);
-	myskim->Branch("topBjetPt", &topBjetPt);
-	myskim->Branch("topBjetEta", &topBjetEta);
-	myskim->Branch("topBjetPhi", &topBjetPhi);
-	myskim->Branch("topBjetMass", &topBjetMass);
-	myskim->Branch("topBjetBTag", &topBjetBTag);
-	myskim->Branch("recWPt", &recWPt);
-	myskim->Branch("recWEta", &recWEta);
-	myskim->Branch("recWPhi", &recWPhi);
-	myskim->Branch("recWMass", &recWMass);
-	myskim->Branch("rectopPt", &rectopPt);
-	myskim->Branch("rectopEta", &rectopEta);
-	myskim->Branch("rectopPhi", &rectopPhi);
-	myskim->Branch("rectopMass", &rectopMass);
+	myskim->Branch("leadJetPt", &leadJetPt);
+	myskim->Branch("leadJetEta", &leadJetEta);
+	myskim->Branch("leadJetPhi", &leadJetPhi);
+	myskim->Branch("leadJetMass", &leadJetMass);
+	myskim->Branch("leadJetBTag", &leadJetBTag);
+	myskim->Branch("subLeadJetPt", &subLeadJetPt);
+	myskim->Branch("subLeadJetEta", &subLeadJetEta);
+	myskim->Branch("subLeadJetPhi", &subLeadJetPhi);
+	myskim->Branch("subLeadJetMass", &subLeadJetMass);
+	myskim->Branch("subLeadJetBTag", &subLeadJetBTag);
+	myskim->Branch("tlepLeadAK4Pt", &tlepLeadAK4Pt);
+	myskim->Branch("tlepLeadAK4Eta", &tlepLeadAK4Eta);
+	myskim->Branch("tlepLeadAK4Phi", &tlepLeadAK4Phi);
+	myskim->Branch("tlepLeadAK4Mass", &tlepLeadAK4Mass);
+	myskim->Branch("tlepLeadAK4BTag", &tlepLeadAK4BTag);
+	myskim->Branch("NJetsSel", &NJetsSel);
+	myskim->Branch("deltaR_ljets", &deltaR_ljets);
+	myskim->Branch("minDR_lepJet", &minDR_lepJet);
+	myskim->Branch("ptRel_lepJet", &ptRel_lepJet);
+	myskim->Branch("WlepPt", &WlepPt);
+	myskim->Branch("WlepEta", &WlepEta);
+	myskim->Branch("WlepPhi", &WlepPhi);
+	myskim->Branch("WlepMass", &WlepMass);
+	myskim->Branch("thadPt", &thadPt);
+	myskim->Branch("thadEta", &thadEta);
+	myskim->Branch("thadPhi", &thadPhi);
+	myskim->Branch("thadMass", &thadMass);
+	myskim->Branch("thadChi2", &thadChi2);
+	myskim->Branch("tlepPt", &tlepPt);
+	myskim->Branch("tlepEta", &tlepEta);
+	myskim->Branch("tlepPhi", &tlepPhi);
+	myskim->Branch("tlepMass", &tlepMass);
+	myskim->Branch("tlepChi2", &tlepChi2);
 	myskim->Branch("topAK8Pt", &topAK8Pt);
 	myskim->Branch("topAK8Eta", &topAK8Eta);
 	myskim->Branch("topAK8Phi", &topAK8Phi);
@@ -186,16 +243,23 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	myskim->Branch("topAK8Tau32", &topAK8Tau32);
 	myskim->Branch("topAK8SDMass", &topAK8SDMass);
 	myskim->Branch("topAK8BTag", &topAK8BTag);
+	myskim->Branch("Ntoptagged", &Ntoptagged);
 	myskim->Branch("zpPt", &zpPt);
 	myskim->Branch("zpEta", &zpEta);
 	myskim->Branch("zpPhi", &zpPhi);
 	myskim->Branch("zpMass", &zpMass);
 	myskim->Branch("zpDeltaY", &zpDeltaY);
 	myskim->Branch("zpDeltaR", &zpDeltaR);
-	myskim->Branch("genzpPt", &genzpPt);
-	myskim->Branch("genzpEta", &genzpEta);
-	myskim->Branch("genzpPhi", &genzpPhi);
+	//myskim->Branch("genzpPt", &genzpPt);
+	//myskim->Branch("genzpEta", &genzpEta);
+	//myskim->Branch("genzpPhi", &genzpPhi);
 	myskim->Branch("genzpMass", &genzpMass);
+// 	myskim->Branch("genTTBarMass", &genTTBarMass);
+	std::vector<TLorentzVector> selectedjets;
+	std::vector<Int_t> selectedjetsBTag;
+	//std::vector<Jet> overlapjets;
+	std::vector<TLorentzVector> tlep_jets;
+	std::vector<Int_t> tlep_jetsBTag;
 	/*
 	 * Or store a vector of objects (also possible to store only one object)
 	 */
@@ -205,6 +269,10 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 
 
 	//std::cout<<"FName="<<getSampleFile()<<" contains _0PU? "<<getSampleFile().Contains("_0PU")<<std::endl;
+	Int_t Npass1lep = 0;
+	Int_t NpassMET  = 0;
+	Int_t Npass2ak4 = 0;
+	Int_t Npass2ttag = 0;
 	size_t nevents=tree()->entries();
 	if(isTestMode())
 		nevents/=100;
@@ -230,8 +298,9 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		Int_t elIdx = 0;
 		for(size_t iel=0;iel<elecs.size();iel++){
 			//flat info
-			if(elecs.at(iel)->PT < 20) continue;
+			if(elecs.at(iel)->PT < 80) continue;
 			if(fabs(elecs.at(iel)->Eta) > 2.4) continue;
+			//if(elecs.at(elIdx)->IsolationVarRhoCorr/elecs.at(elIdx)->PT > 2.4) continue;
 			Nels++;
 			elIdx=iel;
 			//or objects
@@ -242,7 +311,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		Int_t muIdx = 0;
 		for(size_t imu=0;imu<muontight.size();imu++){
 			//flat info
-			if(muontight.at(imu)->PT < 20) continue;
+			if(muontight.at(imu)->PT < 55) continue;
 			if(fabs(muontight.at(imu)->Eta) > 2.4) continue;
 			Nmus++;
 			muIdx=imu;
@@ -250,23 +319,33 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 
 		isSingEl=false;
 		isSingMu=false;
-		isAllHad=false;
+		//isAllHad=false;
 		lepPt =-999;
 		lepEta=-999;
 		lepPhi=-999;
-		if(Nels==0 && Nmus==0){isAllHad=true;} 
-		else if(Nels==1 && Nmus==0){
+		//if(Nels==0 && Nmus==0){isAllHad=true;} 
+		if(Nels==1 && Nmus==0){
 			isSingEl=true;
 			lepPt=elecs.at(elIdx)->PT;
 			lepEta=elecs.at(elIdx)->Eta;
 			lepPhi=elecs.at(elIdx)->Phi;
+			lepRelIso=elecs.at(elIdx)->IsolationVarRhoCorr/elecs.at(elIdx)->PT;
 			}
 		else if(Nels==0 && Nmus==1){
 			isSingMu=true;
 			lepPt=muontight.at(muIdx)->PT;
 			lepEta=muontight.at(muIdx)->Eta;
 			lepPhi=muontight.at(muIdx)->Phi;
+			lepRelIso=muontight.at(muIdx)->IsolationVarRhoCorr/muontight.at(muIdx)->PT;
 			}
+
+		if(!(isSingEl || isSingMu)) continue;
+		Npass1lep++;
+
+        float lepM=0;
+        if(isSingMu){lepM = 0.105658367;
+        }else{lepM = 0.00051099891;}
+        lepton_lv.SetPtEtaPhiM(lepPt,lepEta,lepPhi,lepM);
 		
 		metPt  = -999;
 		metEta = -999;
@@ -275,24 +354,71 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		metEta = met.at(0)->Eta;
 		metPhi = met.at(0)->Phi;
 
-		Int_t Njets = 0;
-		jetPt.clear();
-		jetEta.clear();
-		jetPhi.clear();
-		jetMass.clear();
-		jetBTag.clear();
+		NJetsSel = 0;
+		minDR_lepJet = 1e9; 
+		ptRel_lepJet = -999;
+		float deltaRljets = 0;
+		TLorentzVector correctedJet;
+		TLorentzVector correctedMET;
+// 		jetPt.clear();
+// 		jetEta.clear();
+// 		jetPhi.clear();
+// 		jetMass.clear();
+// 		jetBTag.clear();
+		selectedjets.clear();
+		deltaR_ljets.clear();
+		selectedjetsBTag.clear();
+		float metPx=metPt*cos(metPhi);
+		float metPy=metPt*sin(metPhi);
 		for(size_t ijet=0;ijet<jet.size();ijet++){
-			if(jet.at(ijet)->PT < 30) continue;
+			if(jet.at(ijet)->PT < 50) continue;
 			if(fabs(jet.at(ijet)->Eta) > 4) continue;
-			jetPt.push_back(jet.at(ijet)->PT);
-			jetEta.push_back(jet.at(ijet)->Eta);
-			jetPhi.push_back(jet.at(ijet)->Phi);
-			jetMass.push_back(jet.at(ijet)->Mass);
-			jetBTag.push_back(jet.at(ijet)->BTag);
-			Njets++;
+// 			jetPt.push_back(jet.at(ijet)->PT);
+// 			jetEta.push_back(jet.at(ijet)->Eta);
+// 			jetPhi.push_back(jet.at(ijet)->Phi);
+// 			jetMass.push_back(jet.at(ijet)->Mass);
+// 			jetBTag.push_back(jet.at(ijet)->BTag);
+			correctedJet = jet.at(ijet)->P4();
+			deltaRljets = lepton_lv.DeltaR(correctedJet);
+			if(deltaRljets<0.4) correctedJet = correctedJet-lepton_lv;
+			selectedjets.push_back(correctedJet);
+			selectedjetsBTag.push_back(jet.at(ijet)->BTag);
+			deltaRljets = lepton_lv.DeltaR(correctedJet);
+			deltaR_ljets.push_back(deltaRljets);
+			if(deltaRljets<minDR_lepJet){
+			  minDR_lepJet = deltaRljets;
+			  ptRel_lepJet = lepton_lv.P()*(correctedJet.Vect().Cross(lepton_lv.Vect()).Mag()/correctedJet.P()/lepton_lv.P());
+			  }
+			metPx += jet.at(ijet)->P4().Px() - correctedJet.Px();
+			metPy += jet.at(ijet)->P4().Py() - correctedJet.Py();
+			NJetsSel++;
 			}
+
+		correctedMET.SetPxPyPzE(metPx,metPy,0,sqrt(metPx*metPx+metPy*metPy));
+		metPt = correctedMET.Pt();
+		metEta = correctedMET.Eta();
+		metPhi = correctedMET.Phi();
+
+		if(metPt<50) continue;
+		NpassMET++;
+		if(NJetsSel<2) continue;
+		if(selectedjets.at(0).Pt()<150) continue;
+		if(selectedjets.at(1).Pt()<50) continue;
+		Npass2ak4++;
+
+		leadJetPt=selectedjets.at(0).Pt();
+		leadJetEta=selectedjets.at(0).Eta();
+		leadJetPhi=selectedjets.at(0).Phi();
+		leadJetMass=selectedjets.at(0).M();
+		leadJetBTag=selectedjetsBTag.at(0);
+		subLeadJetPt=selectedjets.at(1).Pt();
+		subLeadJetEta=selectedjets.at(1).Eta();
+		subLeadJetPhi=selectedjets.at(1).Phi();
+		subLeadJetMass=selectedjets.at(1).M();
+		subLeadJetBTag=selectedjetsBTag.at(1);
 		
-		Int_t NAK8jets = 0;
+		//Int_t NAK8jets = 0;
+		Ntoptagged = 0;
 		jetAK8Pt.clear();
 		jetAK8Eta.clear();
 		jetAK8Phi.clear();
@@ -301,9 +427,13 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		jetAK8SDMass.clear();
 		jetAK8BTag.clear();
 		for(size_t ijet=0;ijet<jetAK8.size();ijet++){
+			//NAK8jets++;
 			if(jetAK8.at(ijet)->PT < 400) continue;
 			if(fabs(jetAK8.at(ijet)->Eta) > 4) continue;
-			if(jetAK8.at(ijet)->SoftDroppedJet.M() < 50) continue;
+			//if(jetAK8.at(ijet)->SoftDroppedJet.M() < 50) continue;
+			if(jetAK8.at(ijet)->SoftDroppedJet.M() < 105) continue;
+			if(jetAK8.at(ijet)->SoftDroppedJet.M() > 210) continue;
+			if(jetAK8.at(ijet)->Tau[2]/jetAK8.at(ijet)->Tau[1] > 0.65) continue;
 			jetAK8Pt.push_back(jetAK8.at(ijet)->PT);
 			jetAK8Eta.push_back(jetAK8.at(ijet)->Eta);
 			jetAK8Phi.push_back(jetAK8.at(ijet)->Phi);
@@ -311,10 +441,11 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 			jetAK8Tau32.push_back(jetAK8.at(ijet)->Tau[2]/jetAK8.at(ijet)->Tau[1]);
 			jetAK8SDMass.push_back(jetAK8.at(ijet)->SoftDroppedJet.M());
 			jetAK8BTag.push_back(jetAK8.at(ijet)->BTag);
-			NAK8jets++;
+			Ntoptagged++;
 			}
-		if(NAK8jets>1){isAllHad=true;}
-		if(!((isSingEl || isSingMu) && !isAllHad && Njets>0 && NAK8jets>0)) continue;
+		//if(NAK8jets>1){isAllHad=true;}
+		if(Ntoptagged>1) continue;
+		Npass2ttag++;
 
 		zpPt=-999;
 		zpEta=-999;
@@ -322,135 +453,229 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		zpMass=-999;
 		zpDeltaY=-999;
 		zpDeltaR=-999;
+					
+		tlepLeadAK4Pt=-999;
+		tlepLeadAK4Eta=-999;
+		tlepLeadAK4Phi=-999;
+		tlepLeadAK4Mass=-999;
+		tlepLeadAK4BTag=0;
 		
-		topBjetPt=-999;
-		topBjetEta=-999;
-		topBjetPhi=-999;
-		topBjetMass=-999;
-		topBjetBTag=-999;
-		recWPt=-999;
-		recWEta=-999;
-		recWPhi=-999;
-		recWMass=-999;
-		rectopPt=-999;
-		rectopEta=-999;
-		rectopPhi=-999;
-		rectopMass=-999;
+		WlepPt=-999;
+		WlepEta=-999;
+		WlepPhi=-999;
+		WlepMass=-999;
+		
+		thadPt=-999;
+		thadEta=-999;
+		thadPhi=-999;
+		thadMass=-999;
+		thadChi2=999;
+		
+		tlepPt=-999;
+		tlepEta=-999;
+		tlepPhi=-999;
+		tlepMass=-999;
+		tlepChi2=999;
 	      
-          // ----------------------------------------------------------------------------
-          // W --> l nu with mass constraint
-          // ----------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------
+        // W --> l nu with mass constraint
+        // ----------------------------------------------------------------------------
+          	         
+        //float metPx = metPt*cos(metPhi);
+        //float metPy = metPt*sin(metPhi);
           
-          Double_t lepM;
-          if(isSingMu){
-            lepM = 0.105658367;
-            lepton_lv.SetPtEtaPhiM(lepPt,lepEta,lepPhi,lepM);
-          }else{
-          	lepM = 0.00051099891;
-            lepton_lv.SetPtEtaPhiM(lepPt,lepEta,lepPhi,lepM);
-         	}
-	         
-          Double_t metPx = metPt*cos(metPhi);
-          Double_t metPy = metPt*sin(metPhi);
+        float Dtmp = MW*MW-lepM*lepM+2.0*(lepton_lv.Px()*metPx+lepton_lv.Py()*metPy);
+        float Atmp = 4.0*(lepton_lv.Energy()*lepton_lv.Energy()-lepton_lv.Pz()*lepton_lv.Pz());
+        float Btmp =-4.0*Dtmp*lepton_lv.Pz();
+        float Ctmp = 4.0*lepton_lv.Energy()*lepton_lv.Energy()*metPt*metPt-Dtmp*Dtmp;
+        float DETtmp = Btmp*Btmp-4.0*Atmp*Ctmp;
           
-          Double_t Dtmp = MW*MW-lepM*lepM+2.0*(lepton_lv.Px()*metPx+lepton_lv.Py()*metPy);
-          Double_t Atmp = 4.0*(lepton_lv.Energy()*lepton_lv.Energy()-lepton_lv.Pz()*lepton_lv.Pz());
-          Double_t Btmp =-4.0*Dtmp*lepton_lv.Pz();
-          Double_t Ctmp = 4.0*lepton_lv.Energy()*lepton_lv.Energy()*metPt*metPt-Dtmp*Dtmp;
-          
-          Double_t nuPz_1;
-          Double_t nuPz_2;
-          
-          Double_t DETtmp = Btmp*Btmp-4.0*Atmp*Ctmp;
-          
-          if(DETtmp >= 0){ // real roots
-            nuPz_1 = (-Btmp+TMath::Sqrt(DETtmp))/(2.0*Atmp);
-            nuPz_2 = (-Btmp-TMath::Sqrt(DETtmp))/(2.0*Atmp);
-            nu_lv1.SetPxPyPzE(metPx,metPy,nuPz_1,TMath::Sqrt(metPt*metPt+nuPz_1*nuPz_1));
-            nu_lv2.SetPxPyPzE(metPx,metPy,nuPz_2,TMath::Sqrt(metPt*metPt+nuPz_2*nuPz_2));
-            W_lv_r1 = nu_lv1+lepton_lv;
-            W_lv_r2 = nu_lv2+lepton_lv;
-          }else{ // complex roots
-            nuPz_1 = (-Btmp)/(2.0*Atmp);
-            nuPz_2 = (-Btmp)/(2.0*Atmp);
-            Double_t alpha = (lepton_lv.Px()*metPx+lepton_lv.Py()*metPy)/metPt;
-            Double_t Delta = MW*MW-lepM*lepM;
-            Atmp = 4.0*(lepton_lv.Pz()*lepton_lv.Pz()-lepton_lv.Energy()*lepton_lv.Energy()+alpha*alpha);
-            Btmp = 4.0*alpha*Delta;
-            Ctmp = Delta*Delta;
-            DETtmp = Btmp*Btmp-4.0*Atmp*Ctmp;
-            Double_t pTnu_1 = (-Btmp+TMath::Sqrt(DETtmp))/(2.0*Atmp);
-            Double_t pTnu_2 = (-Btmp-TMath::Sqrt(DETtmp))/(2.0*Atmp);
-            nu_lv1.SetPxPyPzE(metPx*(pTnu_1)/(metPt),metPy*(pTnu_1)/(metPt),nuPz_1,TMath::Sqrt((pTnu_1)*(pTnu_1)+(nuPz_1)*(nuPz_1)));
-            nu_lv2.SetPxPyPzE(metPx*(pTnu_2)/(metPt),metPy*(pTnu_2)/(metPt),nuPz_2,TMath::Sqrt((pTnu_2)*(pTnu_2)+(nuPz_2)*(nuPz_2)));
-            W_lv_r1 = nu_lv1+lepton_lv;
-            W_lv_r2 = nu_lv2+lepton_lv;
-            if (fabs(W_lv_r1.M()-MW) < fabs(W_lv_r2.M()-MW)) W_lv_r2 = W_lv_r1;
-            else W_lv_r1 = W_lv_r2;
-            }
-            
-          // ----------------------------------------------------------------------------
-      	  // top --> W b --> l nu b using W from above
-          // ----------------------------------------------------------------------------
-          
+        float nuPz_1,nuPz_2;
+        if(DETtmp >= 0){ // real roots, two solutions
+          nuPz_1 = (-Btmp+TMath::Sqrt(DETtmp))/(2.0*Atmp);
+          nuPz_2 = (-Btmp-TMath::Sqrt(DETtmp))/(2.0*Atmp);
+        }else{ // complex roots ==> use the real part, only one solution in this case
+          nuPz_1 = (-Btmp)/(2.0*Atmp);
+          nuPz_2 = (-Btmp)/(2.0*Atmp);
+          }
+        nu_lv1.SetPxPyPzE(metPx,metPy,nuPz_1,TMath::Sqrt(metPt*metPt+nuPz_1*nuPz_1));
+        nu_lv2.SetPxPyPzE(metPx,metPy,nuPz_2,TMath::Sqrt(metPt*metPt+nuPz_2*nuPz_2));
+
+        W_lv_r1 = nu_lv1+lepton_lv;
+        W_lv_r2 = nu_lv2+lepton_lv;
+
+	    int bIndex = 0;
+	    
+	    if(Ntoptagged==0){
+	      unsigned int n_neusols = 2;
+		  float current_best_disc = std::numeric_limits<float>::infinity();
+		  
+	      for(unsigned int neu=0; neu < n_neusols; neu++){
+			  TLorentzVector wlep_v4;
+			  if(neu==0){wlep_v4=W_lv_r1;}
+			  else if(neu==1){wlep_v4=W_lv_r2;}
+			  
+			  unsigned int n_jets = selectedjets.size();
+			  if(n_jets>10) n_jets=10; //avoid crashes in events with many jets
+			  const unsigned int max_j = pow(3, n_jets);
+			  
+			  for(unsigned int j=0; j < max_j; j++) {
+				 TLorentzVector tophad_v4;
+				 tophad_v4.SetPxPyPzE(0,0,0,0);
+				 TLorentzVector toplep_v4 = wlep_v4;
+				 int hadjets=0;
+				 int lepjets=0;
+				 int num = j;
+				 float maxBPt = -1;
+				 int bIndexTemp = 0;
+				 for(unsigned int ijet=0; ijet < n_jets; ijet++){
+					if(num%3==0){
+					  tophad_v4 = tophad_v4 + selectedjets.at(ijet);
+					  hadjets++;
+					  }
+					if(num%3==1){
+					  toplep_v4 = toplep_v4 + selectedjets.at(ijet);
+					  lepjets++;
+					  if(selectedjets.at(ijet).Pt() > maxBPt){
+					  	bIndexTemp=ijet;
+					  	maxBPt=selectedjets.at(ijet).Pt();
+					  	}
+					  }
+					num /= 3;
+					}
+				
+				if(hadjets>0 && lepjets>0) {
+				  const float Mtlep_reco = tophad_v4.M();
+				  const float Mthad_reco = toplep_v4.M();
+				
+				  const double chi2_tlep = pow((Mtlep_reco - Mtlep_mean_0t_) / Mtlep_sigma_0t_, 2);
+				  const double chi2_thad = pow((Mthad_reco - Mthad_mean_0t_) / Mthad_sigma_0t_, 2);
+				  
+				  if(chi2_tlep+chi2_thad < current_best_disc){
+				  	j0_lv = tophad_v4;
+				  	j1_lv = toplep_v4;
+				  	current_best_disc = chi2_tlep+chi2_thad;
+				  	thadChi2 = chi2_thad;
+				  	tlepChi2 = chi2_tlep;
+				  	W_lv = wlep_v4;
+				  	bIndex = bIndexTemp;
+				  	}
+				  }
+				} // 3^n_jets jet combinations
+			  } // neutrinos
+		  }
+		
+		if(Ntoptagged==1){
 	      j0_lv.SetPtEtaPhiM(jetAK8Pt.at(0),jetAK8Eta.at(0),jetAK8Phi.at(0),jetAK8Mass.at(0));
-          Double_t dMTOP = 1e8;
-          Int_t bIndex = -1;
-          Bool_t firstW = true;
-          Double_t MTop_1, MTop_2;
-          for(unsigned int ijet=0; ijet < jetPt.size(); ijet++){
-	         b_lv.SetPtEtaPhiM(jetPt.at(ijet),jetEta.at(ijet),jetPhi.at(ijet),jetMass.at(ijet));
-	         if(j0_lv.DeltaR(b_lv)<1.2) continue; //Require AK4 and AK8 jets to be well separated (value from B2G-17-017)
-	         MTop_1 = (b_lv + W_lv_r1).M();
-	         MTop_2 = (b_lv + W_lv_r2).M();
-	         if(fabs(MTop_1 - MTOP) < dMTOP){
-	           if(fabs(MTop_1 - MTOP) < fabs(MTop_2 - MTOP)){
-	             firstW = true;
-	             bIndex = ijet;
-	             dMTOP = fabs(MTop_1 - MTOP);
-	           }else{
-	             firstW = false;
-	             bIndex = ijet;
-	             dMTOP = fabs(MTop_2 - MTOP);
-	             }
-	         }else if(fabs(MTop_2 - MTOP) < dMTOP){
-	           firstW = false;
-	           bIndex = ijet;
-	           dMTOP = fabs(MTop_2 - MTOP);
-	           }
-	         }
+	      TLorentzVector tophad_v4 = j0_lv;
 
-          if(firstW) {W_lv = W_lv_r1;}
-          else{W_lv = W_lv_r2;}
-          
-          if(bIndex>=0){
-            b_lv.SetPtEtaPhiM(jetPt.at(bIndex),jetEta.at(bIndex),jetPhi.at(bIndex),jetMass.at(bIndex));
-            j1_lv = W_lv+b_lv; //Leptonic top LV
-		    zp_lv = j0_lv+j1_lv;
+	      tlep_jets.clear();
+	      tlep_jetsBTag.clear();
+	      for(unsigned int tjet=0; tjet < selectedjets.size(); tjet++){
+	      	 if(j0_lv.DeltaR(selectedjets.at(tjet))<1.2) continue;
+	      	 tlep_jets.push_back(selectedjets.at(tjet));
+	      	 tlep_jetsBTag.push_back(selectedjetsBTag.at(tjet));
+	      	 }
 
-      	    zpPt = zp_lv.Pt();
-      	  	zpEta = zp_lv.Eta();
-      	  	zpPhi = zp_lv.Phi();
-      	    zpMass = zp_lv.M();
-      	    zpDeltaY = fabs(j0_lv.Rapidity()-j1_lv.Rapidity());
-      	    zpDeltaR = j0_lv.DeltaR(j1_lv);
+		  if(tlep_jets.size()==0){
+		  	std::cout<<"There is no AK4 jet with DR>1.2 from t-tagged jet! Skipping ..."<<std::endl;
+		  	continue;
+		  	}
+		  
+		  unsigned int n_jets = tlep_jets.size();
+		  const unsigned int max_j = pow(2, n_jets);
 
-			topBjetPt=jetPt.at(bIndex);
-			topBjetEta=jetEta.at(bIndex);
-			topBjetPhi=jetPhi.at(bIndex);
-			topBjetMass=jetMass.at(bIndex);
-			topBjetBTag=jetBTag.at(bIndex);
+	      unsigned int n_neusols = 2;
+		  float current_best_disc = std::numeric_limits<float>::infinity();
+		  
+	      for(unsigned int neu=0; neu < n_neusols; neu++){
+			  TLorentzVector wlep_v4;
+			  if(neu==0){wlep_v4=W_lv_r1;}
+			  else if(neu==1){wlep_v4=W_lv_r2;}
+			  			  
+			  for(unsigned int j=0; j < max_j; j++) {
+				 TLorentzVector toplep_v4 = wlep_v4;
+				 int lepjets=0;
+				 float maxBPt = -1;
+				 int bIndexTemp = 0;
+				 for(unsigned int ijet=0; ijet < n_jets; ijet++){
+					int jet_topidx = int(j/(pow(2,ijet))) % 2;
+					if(jet_topidx == 1){
+					  toplep_v4 = toplep_v4 + tlep_jets.at(ijet);
+					  lepjets++;
+					  if(tlep_jets.at(ijet).Pt() > maxBPt){
+					  	bIndexTemp=ijet;
+					  	maxBPt=tlep_jets.at(ijet).Pt();
+					  	}
+					  }
+					}
+				
+				if(lepjets>0){
+				  const float Mtlep_reco = tophad_v4.M();
+				  const float Mthad_reco = toplep_v4.M();
+				
+				  const double chi2_tlep = pow((Mtlep_reco - Mtlep_mean_1t_) / Mtlep_sigma_1t_, 2);
+				  const double chi2_thad = pow((Mthad_reco - Mthad_mean_1t_) / Mthad_sigma_1t_, 2);
+				  
+				  if(chi2_tlep+chi2_thad < current_best_disc){
+				  	//j0_lv = tophad_v4;
+				  	j1_lv = toplep_v4;
+				  	current_best_disc = chi2_tlep+chi2_thad;
+				  	thadChi2 = chi2_thad;
+				  	tlepChi2 = chi2_tlep;
+				  	W_lv = wlep_v4;
+				  	bIndex = bIndexTemp;
+				  	}
+				  }
+				} // 2^n_jets jet combinations
+			  } // neutrinos
+		  }
+		zp_lv = j0_lv+j1_lv;
+		
+		zpPt = zp_lv.Pt();
+		zpEta = zp_lv.Eta();
+      	zpPhi = zp_lv.Phi();
+      	zpMass = zp_lv.M();
+      	zpDeltaY = fabs(j0_lv.Rapidity()-j1_lv.Rapidity());
+      	zpDeltaR = j0_lv.DeltaR(j1_lv);
 
-      	    recWPt = W_lv.Pt();
-      	  	recWEta = W_lv.Eta();
-      	  	recWPhi = W_lv.Phi();
-      	    recWMass = W_lv.M();
+	    if(Ntoptagged==0){
+			tlepLeadAK4Pt=selectedjets.at(bIndex).Pt();
+			tlepLeadAK4Eta=selectedjets.at(bIndex).Eta();
+			tlepLeadAK4Phi=selectedjets.at(bIndex).Phi();
+			tlepLeadAK4Mass=selectedjets.at(bIndex).M();
+			tlepLeadAK4BTag=selectedjetsBTag.at(bIndex);
+	    }else if(Ntoptagged==1){
+			tlepLeadAK4Pt=tlep_jets.at(bIndex).Pt();
+			tlepLeadAK4Eta=tlep_jets.at(bIndex).Eta();
+			tlepLeadAK4Phi=tlep_jets.at(bIndex).Phi();
+			tlepLeadAK4Mass=tlep_jets.at(bIndex).M();
+			tlepLeadAK4BTag=tlep_jetsBTag.at(bIndex);
+			}
 
-      	    rectopPt = j1_lv.Pt();
-      	  	rectopEta = j1_lv.Eta();
-      	  	rectopPhi = j1_lv.Phi();
-      	    rectopMass = j1_lv.M();
+      	WlepPt = W_lv.Pt();
+      	WlepEta = W_lv.Eta();
+      	WlepPhi = W_lv.Phi();
+      	WlepMass = W_lv.M();
 
+      	thadPt = j0_lv.Pt();
+      	thadEta = j0_lv.Eta();
+      	thadPhi = j0_lv.Phi();
+      	thadMass = j0_lv.M();
+
+      	tlepPt = j1_lv.Pt();
+      	tlepEta = j1_lv.Eta();
+      	tlepPhi = j1_lv.Phi();
+      	tlepMass = j1_lv.M();
+
+		topAK8Pt=-999;
+		topAK8Eta=-999;
+		topAK8Phi=-999;
+		topAK8Mass=-999;
+		topAK8Tau32=-999;
+		topAK8SDMass=-999;
+		topAK8BTag=0;
+		if(Ntoptagged>0){
 			topAK8Pt=jetAK8Pt.at(0);
 			topAK8Eta=jetAK8Eta.at(0);
 			topAK8Phi=jetAK8Phi.at(0);
@@ -458,25 +683,33 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 			topAK8Tau32=jetAK8Tau32.at(0);
 			topAK8SDMass=jetAK8SDMass.at(0);
 			topAK8BTag=jetAK8BTag.at(0);
-          }else{
-          	std::cout<<"No b-jet was found near leptonic W! Continuing ..."<<std::endl;
-          	continue;
-		  }
+			}
 
-		genzpPt=-999;
-		genzpEta=-999;
-		genzpPhi=-999;
+		//genzpPt=-999;
+		//genzpEta=-999;
+		//genzpPhi=-999;
 		genzpMass=-999;
-
-		for (unsigned int i=0;i<genpart.size();i++){
+		//genTTBarMass=-999;
+		for(unsigned int i=0;i<genpart.size();i++){
 			if (genpart.at(i)->PID==5100021){
-				genzpPt=genpart.at(i)->PT;
-				genzpEta=genpart.at(i)->Eta;
-				genzpPhi=genpart.at(i)->Phi;
+				//genzpPt=genpart.at(i)->PT;
+				//genzpEta=genpart.at(i)->Eta;
+				//genzpPhi=genpart.at(i)->Phi;
 				genzpMass=genpart.at(i)->Mass;
 				break;
 				}
+// 			if (fabs(genpart.at(i)->PID)==6){
+// 				genTopP4.push_back(genpart.at(i)->P4());
+// 				genTopID.push_back(genpart.at(i)->PID);
+// 				}
 			}
+// 		if(genTopP4.size()!= 2){
+// 			std::cout<<"Found "<<genTopP4.size()<<" tops with";
+// 			for(unsigned int itop=0;itop<genTopP4.size();itop++){std::cout<<"top["<<itop<<"] id: "<<genTopID.at(itop)<<" ";}
+// 			std::cout<<std::endl;
+// 		}else if(genTopID.at(0)*genTopID.at(1) > 0){
+// 			std::cout<<"Found 2 tops with the same ID!!";
+// 		}else{genTTBarMass=(genTopP4.at(0)+genTopP4.at(1)).M();}
 
 		myskim->Fill();
 
@@ -489,7 +722,11 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		//	histo->Fill(skimelecs->at(i).PT);
 		//}
 	}
-
+	
+	std::cout<<"Npass1lep /Ntotal    ="<<Npass1lep<<"/"<<nevents<<std::endl;
+	std::cout<<"NpassMET  /Npass1lep ="<<NpassMET<<"/"<<Npass1lep<<std::endl;
+	std::cout<<"Npass2ak4 /NpassMET  ="<<Npass2ak4<<"/"<<NpassMET<<std::endl;
+	std::cout<<"Npass2ttag/Npass2ak4 ="<<Npass2ttag<<"/"<<Npass2ak4<<std::endl;
 
 	/*
 	 * Must be called in the end, takes care of thread-safe writeout and
