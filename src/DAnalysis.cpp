@@ -59,7 +59,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	d_ana::dBranchHandler<Jet>         jet(tree(),"JetPUPPI");
 	d_ana::dBranchHandler<Muon>        muontight(tree(),"MuonTight");
 	//d_ana::dBranchHandler<Photon>      photon(tree(),"Photon");
-	d_ana::dBranchHandler<MissingET>   met(tree(),"MissingET");
+	d_ana::dBranchHandler<MissingET>   met(tree(),"PuppiMissingET");
 	//d_ana::dBranchHandler<Vertex>      vrtx(tree(),"Vertex");
 
 // 	TString jetCollection = "";
@@ -104,9 +104,12 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	 * Add a simple branch to the skim
 	 */
 	
+	Int_t isSignal = getSampleFile().Contains("RSGluonToTTbar_");
+	Int_t isTT  = getSampleFile().Contains("TT_TuneCUETP8M2") || getSampleFile().Contains("TT_Mtt");
+	Int_t isQCD = getSampleFile().Contains("QCD_Pt-") || getSampleFile().Contains("QCD_Mdijet-") || getSampleFile().Contains("QCD_Flat_");
+	
 	Bool_t isSingEl=false;
 	Bool_t isSingMu=false;
-	//Bool_t isAllHad=false;
 	
 	Double_t metPt =-999;
 	Double_t metEta=-999;
@@ -116,6 +119,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	Double_t lepEta=-999;
 	Double_t lepPhi=-999;
 	Double_t lepRelIso=-999;
+	Double_t lepAbsIso=-999;
 	
 	Double_t leadJetPt=-999;
 	Double_t leadJetEta=-999;
@@ -133,7 +137,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 // 	std::vector<Double_t> jetPhi;
 // 	std::vector<Double_t> jetMass;
 // 	std::vector<Int_t> jetBTag;
-	std::vector<Double_t> deltaR_ljets;
+// 	std::vector<Double_t> deltaR_ljets;
 
 	Double_t tlepLeadAK4Pt=-999;
 	Double_t tlepLeadAK4Eta=-999;
@@ -190,9 +194,9 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	Double_t genzpMass=-999;
 	TLorentzVector lepton_lv,j0_lv,j1_lv,zp_lv,W_lv,W_lv_r1,W_lv_r2,nu_lv1,nu_lv2,b_lv;
 
-// 	std::vector<TLorentzVector> genTopP4;
-// 	std::vector<Int_t> genTopID;
-// 	Double_t genTTBarMass=-999;
+	std::vector<TLorentzVector> genParP4;
+	std::vector<Int_t> genParID;
+	Double_t genTTorJJMass=-999;
 	
 	myskim->Branch("isSingEl", &isSingEl);
 	myskim->Branch("isSingMu", &isSingMu);
@@ -200,6 +204,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	myskim->Branch("lepEta", &lepEta);
 	myskim->Branch("lepPhi", &lepPhi);
 	myskim->Branch("lepRelIso", &lepRelIso);
+	myskim->Branch("lepAbsIso", &lepAbsIso);
 	myskim->Branch("metPt", &metPt);
 	myskim->Branch("metEta", &metEta);
 	myskim->Branch("metPhi", &metPhi);
@@ -219,7 +224,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	myskim->Branch("tlepLeadAK4Mass", &tlepLeadAK4Mass);
 	myskim->Branch("tlepLeadAK4BTag", &tlepLeadAK4BTag);
 	myskim->Branch("NJetsSel", &NJetsSel);
-	myskim->Branch("deltaR_ljets", &deltaR_ljets);
+	//myskim->Branch("deltaR_ljets", &deltaR_ljets);
 	myskim->Branch("minDR_lepJet", &minDR_lepJet);
 	myskim->Branch("ptRel_lepJet", &ptRel_lepJet);
 	myskim->Branch("WlepPt", &WlepPt);
@@ -254,7 +259,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	//myskim->Branch("genzpEta", &genzpEta);
 	//myskim->Branch("genzpPhi", &genzpPhi);
 	myskim->Branch("genzpMass", &genzpMass);
-// 	myskim->Branch("genTTBarMass", &genTTBarMass);
+	myskim->Branch("genTTorJJMass", &genTTorJJMass);
 	std::vector<TLorentzVector> selectedjets;
 	std::vector<Int_t> selectedjetsBTag;
 	//std::vector<Jet> overlapjets;
@@ -298,8 +303,8 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		Int_t elIdx = 0;
 		for(size_t iel=0;iel<elecs.size();iel++){
 			//flat info
-			if(elecs.at(iel)->PT < 80) continue;
-			if(fabs(elecs.at(iel)->Eta) > 2.4) continue;
+			if(elecs.at(iel)->PT < 65) continue;
+			if(fabs(elecs.at(iel)->Eta) > 3) continue; //vs. 2.5
 			//if(elecs.at(elIdx)->IsolationVarRhoCorr/elecs.at(elIdx)->PT > 2.4) continue;
 			Nels++;
 			elIdx=iel;
@@ -312,31 +317,35 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		for(size_t imu=0;imu<muontight.size();imu++){
 			//flat info
 			if(muontight.at(imu)->PT < 55) continue;
-			if(fabs(muontight.at(imu)->Eta) > 2.4) continue;
+			if(fabs(muontight.at(imu)->Eta) > 3) continue; //vs. 2.4
 			Nmus++;
 			muIdx=imu;
 			}
 
 		isSingEl=false;
 		isSingMu=false;
-		//isAllHad=false;
 		lepPt =-999;
 		lepEta=-999;
 		lepPhi=-999;
-		//if(Nels==0 && Nmus==0){isAllHad=true;} 
+		lepRelIso=-999;
+		lepAbsIso=-999;
 		if(Nels==1 && Nmus==0){
 			isSingEl=true;
 			lepPt=elecs.at(elIdx)->PT;
 			lepEta=elecs.at(elIdx)->Eta;
 			lepPhi=elecs.at(elIdx)->Phi;
-			lepRelIso=elecs.at(elIdx)->IsolationVarRhoCorr/elecs.at(elIdx)->PT;
+			lepRelIso=elecs.at(elIdx)->IsolationVarRhoCorr; //Relative isolation
+			lepAbsIso=elecs.at(elIdx)->SumPt; //Absolute isolation (SumPt=IsolationVarRhoCorr*pT)
+			//lepRelIso=elecs.at(elIdx)->IsolationVarRhoCorr/elecs.at(elIdx)->PT;
 			}
 		else if(Nels==0 && Nmus==1){
 			isSingMu=true;
 			lepPt=muontight.at(muIdx)->PT;
 			lepEta=muontight.at(muIdx)->Eta;
 			lepPhi=muontight.at(muIdx)->Phi;
-			lepRelIso=muontight.at(muIdx)->IsolationVarRhoCorr/muontight.at(muIdx)->PT;
+			lepRelIso=muontight.at(muIdx)->IsolationVarRhoCorr; //Relative isolation
+			lepAbsIso=muontight.at(muIdx)->SumPt; //Absolute isolation (SumPt=IsolationVarRhoCorr*pT)
+			//lepRelIso=muontight.at(muIdx)->IsolationVarRhoCorr/muontight.at(muIdx)->PT;
 			}
 
 		if(!(isSingEl || isSingMu)) continue;
@@ -347,9 +356,6 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
         }else{lepM = 0.00051099891;}
         lepton_lv.SetPtEtaPhiM(lepPt,lepEta,lepPhi,lepM);
 		
-		metPt  = -999;
-		metEta = -999;
-		metPhi = -999;
 		metPt  = met.at(0)->MET;
 		metEta = met.at(0)->Eta;
 		metPhi = met.at(0)->Phi;
@@ -366,36 +372,50 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 // 		jetMass.clear();
 // 		jetBTag.clear();
 		selectedjets.clear();
-		deltaR_ljets.clear();
+		//deltaR_ljets.clear();
 		selectedjetsBTag.clear();
 		float metPx=metPt*cos(metPhi);
 		float metPy=metPt*sin(metPhi);
 		for(size_t ijet=0;ijet<jet.size();ijet++){
-			if(jet.at(ijet)->PT < 50) continue;
+			if(jet.at(ijet)->PT < 30) continue;
 			if(fabs(jet.at(ijet)->Eta) > 4) continue;
 // 			jetPt.push_back(jet.at(ijet)->PT);
 // 			jetEta.push_back(jet.at(ijet)->Eta);
 // 			jetPhi.push_back(jet.at(ijet)->Phi);
 // 			jetMass.push_back(jet.at(ijet)->Mass);
 // 			jetBTag.push_back(jet.at(ijet)->BTag);
+
+            //Lepton-jet cleaning by subtructing lepton 4v from jet 4v if they aren't separated by DR>0.4
 			correctedJet = jet.at(ijet)->P4();
 			deltaRljets = lepton_lv.DeltaR(correctedJet);
 			if(deltaRljets<0.4) correctedJet = correctedJet-lepton_lv;
+			if(correctedJet.Pt() < 30) continue;
+			if(fabs(correctedJet.Eta()) > 4) continue;
 			selectedjets.push_back(correctedJet);
-			selectedjetsBTag.push_back(jet.at(ijet)->BTag);
+			selectedjetsBTag.push_back(jet.at(ijet)->BTag & (1 << 1)); //Medium WP
 			deltaRljets = lepton_lv.DeltaR(correctedJet);
-			deltaR_ljets.push_back(deltaRljets);
+			//deltaR_ljets.push_back(deltaRljets);
 			if(deltaRljets<minDR_lepJet){
 			  minDR_lepJet = deltaRljets;
 			  ptRel_lepJet = lepton_lv.P()*(correctedJet.Vect().Cross(lepton_lv.Vect()).Mag()/correctedJet.P()/lepton_lv.P());
 			  }
 			metPx += jet.at(ijet)->P4().Px() - correctedJet.Px();
 			metPy += jet.at(ijet)->P4().Py() - correctedJet.Py();
+            
+            /*//Lepton-jet cleaning by removing jets which aren't separated by DR>0.4 from lepton
+ 			deltaRljets = lepton_lv.DeltaR(jet.at(ijet)->P4());
+			if(deltaRljets<0.4) continue;
+			selectedjets.push_back(jet.at(ijet)->P4());
+			selectedjetsBTag.push_back(jet.at(ijet)->BTag & (1 << 1)); //Medium WP
+			if(deltaRljets<minDR_lepJet){
+			  minDR_lepJet = deltaRljets;
+			  ptRel_lepJet = lepton_lv.P()*(jet.at(ijet)->P4().Vect().Cross(lepton_lv.Vect()).Mag()/jet.at(ijet)->P4().P()/lepton_lv.P());
+			  }*/
 			NJetsSel++;
 			}
 
 		correctedMET.SetPxPyPzE(metPx,metPy,0,sqrt(metPx*metPx+metPy*metPy));
-		metPt = correctedMET.Pt();
+		metPt  = correctedMET.Pt();
 		metEta = correctedMET.Eta();
 		metPhi = correctedMET.Phi();
 
@@ -434,6 +454,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 			if(jetAK8.at(ijet)->SoftDroppedJet.M() < 105) continue;
 			if(jetAK8.at(ijet)->SoftDroppedJet.M() > 210) continue;
 			if(jetAK8.at(ijet)->Tau[2]/jetAK8.at(ijet)->Tau[1] > 0.65) continue;
+			if(lepton_lv.DeltaR(jetAK8.at(ijet)->P4())<0.8) continue;
 			jetAK8Pt.push_back(jetAK8.at(ijet)->PT);
 			jetAK8Eta.push_back(jetAK8.at(ijet)->Eta);
 			jetAK8Phi.push_back(jetAK8.at(ijet)->Phi);
@@ -443,16 +464,9 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 			jetAK8BTag.push_back(jetAK8.at(ijet)->BTag);
 			Ntoptagged++;
 			}
-		//if(NAK8jets>1){isAllHad=true;}
-		if(Ntoptagged>1) continue;
+		
+		if(Ntoptagged>1) continue; //all-hadronic events
 		Npass2ttag++;
-
-		zpPt=-999;
-		zpEta=-999;
-		zpPhi=-999;
-		zpMass=-999;
-		zpDeltaY=-999;
-		zpDeltaR=-999;
 					
 		tlepLeadAK4Pt=-999;
 		tlepLeadAK4Eta=-999;
@@ -476,6 +490,13 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		tlepPhi=-999;
 		tlepMass=-999;
 		tlepChi2=999;
+
+		zpPt=-999;
+		zpEta=-999;
+		zpPhi=-999;
+		zpMass=-999;
+		zpDeltaY=-999;
+		zpDeltaR=-999;
 	      
         // ----------------------------------------------------------------------------
         // W --> l nu with mass constraint
@@ -523,19 +544,19 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 				 TLorentzVector tophad_v4;
 				 tophad_v4.SetPxPyPzE(0,0,0,0);
 				 TLorentzVector toplep_v4 = wlep_v4;
-				 int hadjets=0;
-				 int lepjets=0;
+				 int nhadjets=0;
+				 int nlepjets=0;
 				 int num = j;
 				 float maxBPt = -1;
 				 int bIndexTemp = 0;
 				 for(unsigned int ijet=0; ijet < n_jets; ijet++){
 					if(num%3==0){
 					  tophad_v4 = tophad_v4 + selectedjets.at(ijet);
-					  hadjets++;
+					  nhadjets++;
 					  }
 					if(num%3==1){
 					  toplep_v4 = toplep_v4 + selectedjets.at(ijet);
-					  lepjets++;
+					  nlepjets++;
 					  if(selectedjets.at(ijet).Pt() > maxBPt){
 					  	bIndexTemp=ijet;
 					  	maxBPt=selectedjets.at(ijet).Pt();
@@ -544,7 +565,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 					num /= 3;
 					}
 				
-				if(hadjets>0 && lepjets>0) {
+				if(nhadjets>0 && nlepjets>0) {
 				  const float Mtlep_reco = tophad_v4.M();
 				  const float Mthad_reco = toplep_v4.M();
 				
@@ -595,14 +616,14 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 			  			  
 			  for(unsigned int j=0; j < max_j; j++) {
 				 TLorentzVector toplep_v4 = wlep_v4;
-				 int lepjets=0;
+				 int nlepjets=0;
 				 float maxBPt = -1;
 				 int bIndexTemp = 0;
 				 for(unsigned int ijet=0; ijet < n_jets; ijet++){
 					int jet_topidx = int(j/(pow(2,ijet))) % 2;
 					if(jet_topidx == 1){
 					  toplep_v4 = toplep_v4 + tlep_jets.at(ijet);
-					  lepjets++;
+					  nlepjets++;
 					  if(tlep_jets.at(ijet).Pt() > maxBPt){
 					  	bIndexTemp=ijet;
 					  	maxBPt=tlep_jets.at(ijet).Pt();
@@ -610,7 +631,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 					  }
 					}
 				
-				if(lepjets>0){
+				if(nlepjets>0){
 				  const float Mtlep_reco = tophad_v4.M();
 				  const float Mthad_reco = toplep_v4.M();
 				
@@ -618,7 +639,6 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 				  const double chi2_thad = pow((Mthad_reco - Mthad_mean_1t_) / Mthad_sigma_1t_, 2);
 				  
 				  if(chi2_tlep+chi2_thad < current_best_disc){
-				  	//j0_lv = tophad_v4;
 				  	j1_lv = toplep_v4;
 				  	current_best_disc = chi2_tlep+chi2_thad;
 				  	thadChi2 = chi2_thad;
@@ -689,27 +709,50 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		//genzpEta=-999;
 		//genzpPhi=-999;
 		genzpMass=-999;
-		//genTTBarMass=-999;
-		for(unsigned int i=0;i<genpart.size();i++){
-			if (genpart.at(i)->PID==5100021){
-				//genzpPt=genpart.at(i)->PT;
-				//genzpEta=genpart.at(i)->Eta;
-				//genzpPhi=genpart.at(i)->Phi;
-				genzpMass=genpart.at(i)->Mass;
-				break;
+		if(isSignal){
+			for(unsigned int i=0;i<genpart.size();i++){
+				if (genpart.at(i)->PID==5100021){
+					//genzpPt=genpart.at(i)->PT;
+					//genzpEta=genpart.at(i)->Eta;
+					//genzpPhi=genpart.at(i)->Phi;
+					genzpMass=genpart.at(i)->Mass;
+					break;
+					}
 				}
-// 			if (fabs(genpart.at(i)->PID)==6){
-// 				genTopP4.push_back(genpart.at(i)->P4());
-// 				genTopID.push_back(genpart.at(i)->PID);
-// 				}
 			}
-// 		if(genTopP4.size()!= 2){
-// 			std::cout<<"Found "<<genTopP4.size()<<" tops with";
-// 			for(unsigned int itop=0;itop<genTopP4.size();itop++){std::cout<<"top["<<itop<<"] id: "<<genTopID.at(itop)<<" ";}
-// 			std::cout<<std::endl;
-// 		}else if(genTopID.at(0)*genTopID.at(1) > 0){
-// 			std::cout<<"Found 2 tops with the same ID!!";
-// 		}else{genTTBarMass=(genTopP4.at(0)+genTopP4.at(1)).M();}
+		
+		genParP4.clear();
+		genParID.clear();
+		genTTorJJMass=-999;
+		if(isTT || isSignal){
+			//std::cout<<"////////////////////////////////////////////////////////////////////"<<std::endl;
+			for(unsigned int i=0;i<genpart.size();i++){
+				//std::cout<<"PID:"<<genpart.at(i)->PID<<" Status:"<<genpart.at(i)->Status<<std::endl;
+				if (fabs(genpart.at(i)->PID)==6 && genpart.at(i)->Status==22){ // "Status 22 : intermediate (intended to have preserved mass)" from http://home.thep.lu.se/~torbjorn/pythia81html/ParticleProperties.html
+					genParP4.push_back(genpart.at(i)->P4());
+					genParID.push_back(genpart.at(i)->PID);
+					if(genParID.size()>1) break;
+					}
+				}
+			if(genParID.size()!= 2){std::cout<<"WARNING::Found "<<genParID.size()<<" tops!!"<<std::endl;
+			}else if(genParID.at(0)*genParID.at(1) > 0){std::cout<<"WARNING::Found 2 tops with the same ID!!";
+			}else{genTTorJJMass=(genParP4.at(0)+genParP4.at(1)).M();}
+			}
+		
+		if(isQCD){
+			TLorentzVector genQCDP4;
+			genQCDP4.SetPtEtaPhiM(0.,0.,0.,0.);
+			//std::cout<<"////////////////////////////////////////////////////////////////////"<<std::endl;
+			for(unsigned int i=0;i<genpart.size();i++){
+				//std::cout<<"PID:"<<genpart.at(i)->PID<<" Status:"<<genpart.at(i)->Status<<std::endl;
+				if (genpart.at(i)->Status==23){ // "Status 23 : outgoing" from http://home.thep.lu.se/~torbjorn/pythia81html/ParticleProperties.html
+					genQCDP4+=genpart.at(i)->P4();
+					genParID.push_back(genpart.at(i)->PID);
+					}
+				}
+			if(genParID.size()== 0){std::cout<<"WARNING::Found no Status 23 particles!!"<<std::endl;
+			}else{genTTorJJMass=genQCDP4.M();}
+			}
 
 		myskim->Fill();
 
