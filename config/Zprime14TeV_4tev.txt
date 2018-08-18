@@ -1,7 +1,7 @@
 [config-begin]
 
     Outputdir  = output
-    Outputfile = outputfile_RSG4TeV.root
+    Outputfile = outputfile_4tev.root
     Lumi       = 3000  
     Testmode   = false
     Maxchilds  = 6
@@ -14,8 +14,8 @@
 
 [inputfiles-begin]
 
-RSGluonToTTbar_M4000_TuneCUEP8M1_14TeV_pythia8_200PU_1.root,  4TeV200PU_1,  1, 1,  auto, 1, true
-RSGluonToTTbar_M4000_TuneCUEP8M1_14TeV_pythia8_200PU_2.root,  4TeV200PU_2,  1, 1,  auto, 1, true
-RSGluonToTTbar_M4000_TuneCUEP8M1_14TeV_pythia8_200PU_3.root,  4TeV200PU_3,  1, 1,  auto, 1, true
+RSGluonToTTbar_M4000_TuneCUEP8M1_14TeV_pythia8_200PU_1.root,  4tev,  1, 1,  auto, 1, true
+RSGluonToTTbar_M4000_TuneCUEP8M1_14TeV_pythia8_200PU_2.root,  4tev,  1, 1,  auto, 1, true
+RSGluonToTTbar_M4000_TuneCUEP8M1_14TeV_pythia8_200PU_3.root,  4tev,  1, 1,  auto, 1, true
 
 [inputfiles-end]

@@ -1,0 +1,33 @@
+[config-begin]
+
+    Outputdir  = output
+    Outputfile = outputfile_qcdpt80to120.root
+    Lumi       = 3000  
+    Testmode   = false
+    Maxchilds  = 15
+    Samplesdir = root://cms-xrd-global.cern.ch//store/group/upgrade/delphes_output/YR_Delphes/Delphes342pre15_hadd/QCD_Pt-80to120_TuneCUETP8M1_14TeV_pythia8_200PU/
+    RunOnOutputOnly = false
+
+[config-end]
+
+
+
+[inputfiles-begin]
+
+QCD_Pt-80to120_TuneCUETP8M1_14TeV_pythia8_200PU_10.root,  qcdpt80to120,  1, 1,  auto, 1, true
+QCD_Pt-80to120_TuneCUETP8M1_14TeV_pythia8_200PU_11.root,  qcdpt80to120,  1, 1,  auto, 1, true
+QCD_Pt-80to120_TuneCUETP8M1_14TeV_pythia8_200PU_12.root,  qcdpt80to120,  1, 1,  auto, 1, true
+QCD_Pt-80to120_TuneCUETP8M1_14TeV_pythia8_200PU_13.root,  qcdpt80to120,  1, 1,  auto, 1, true
+QCD_Pt-80to120_TuneCUETP8M1_14TeV_pythia8_200PU_14.root,  qcdpt80to120,  1, 1,  auto, 1, true
+QCD_Pt-80to120_TuneCUETP8M1_14TeV_pythia8_200PU_15.root,  qcdpt80to120,  1, 1,  auto, 1, true
+QCD_Pt-80to120_TuneCUETP8M1_14TeV_pythia8_200PU_1.root,  qcdpt80to120,  1, 1,  auto, 1, true
+QCD_Pt-80to120_TuneCUETP8M1_14TeV_pythia8_200PU_2.root,  qcdpt80to120,  1, 1,  auto, 1, true
+QCD_Pt-80to120_TuneCUETP8M1_14TeV_pythia8_200PU_3.root,  qcdpt80to120,  1, 1,  auto, 1, true
+QCD_Pt-80to120_TuneCUETP8M1_14TeV_pythia8_200PU_4.root,  qcdpt80to120,  1, 1,  auto, 1, true
+QCD_Pt-80to120_TuneCUETP8M1_14TeV_pythia8_200PU_5.root,  qcdpt80to120,  1, 1,  auto, 1, true
+QCD_Pt-80to120_TuneCUETP8M1_14TeV_pythia8_200PU_6.root,  qcdpt80to120,  1, 1,  auto, 1, true
+QCD_Pt-80to120_TuneCUETP8M1_14TeV_pythia8_200PU_7.root,  qcdpt80to120,  1, 1,  auto, 1, true
+QCD_Pt-80to120_TuneCUETP8M1_14TeV_pythia8_200PU_8.root,  qcdpt80to120,  1, 1,  auto, 1, true
+QCD_Pt-80to120_TuneCUETP8M1_14TeV_pythia8_200PU_9.root,  qcdpt80to120,  1, 1,  auto, 1, true
+
+[inputfiles-end]
