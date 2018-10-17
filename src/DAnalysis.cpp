@@ -388,13 +388,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		float deltaRljets = 0;
 		TLorentzVector correctedJet;
 		TLorentzVector correctedMET,objBasedMET;
-// 		jetPt.clear();
-// 		jetEta.clear();
-// 		jetPhi.clear();
-// 		jetMass.clear();
-// 		jetBTag.clear();
 		selectedjets.clear();
-		//deltaR_ljets.clear();
 		selectedjetsBTag.clear();
 		float metPx=metPt*cos(metPhi);
 		float metPy=metPt*sin(metPhi);
@@ -402,20 +396,10 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		float metObjBasedPy=-lepton_lv.Py();
 		
 		float uncScale = 1;
-// 		float beta = -999;
-// 		float newE = -999;
-// 		float newPt = -999;
-// 		float newEta = -999;
-// 		float newPhi = -999;
+		int binnum = 0;
 		for(size_t ijet=0;ijet<jet.size();ijet++){
 			if(jet.at(ijet)->PT < 30) continue;
 			if(fabs(jet.at(ijet)->Eta) > 4) continue;
-// 			jetPt.push_back(jet.at(ijet)->PT);
-// 			jetEta.push_back(jet.at(ijet)->Eta);
-// 			jetPhi.push_back(jet.at(ijet)->Phi);
-// 			jetMass.push_back(jet.at(ijet)->Mass);
-// 			jetBTag.push_back(jet.at(ijet)->BTag);
-
             //Lepton-jet cleaning by subtructing lepton 4v from jet 4v if they aren't separated by DR>0.4
 			correctedJet = jet.at(ijet)->P4();
 			deltaRljets = lepton_lv.DeltaR(correctedJet);
@@ -424,26 +408,18 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 			if(fabs(correctedJet.Eta()) > 4) continue;
 			if(doJECup() || doJECdn()){
 			  	uncScale = 1;
-			  	Int_t binnum = htotJESbjets->GetXaxis()->FindBin(correctedJet.Pt());
+			  	binnum = htotJESbjets->GetXaxis()->FindBin(correctedJet.Pt());
 			  	if(correctedJet.Pt()>2999.99){binnum=htotJESbjets->GetSize()-2;}
 			  	if(jet.at(ijet)->Flavor==5){uncScale = htotJESbjets->GetBinContent(binnum);}
 			    else{uncScale = htotJESljets->GetBinContent(binnum);}
 			    if(doJECup()){uncScale = 1 + uncScale;}
 			    else if(doJECdn()){uncScale = 1 - uncScale;}
 			    correctedJet = correctedJet*uncScale;
-// 				beta = correctedJet.Pt()/correctedJet.Energy();
-// 			    newE = correctedJet.Energy();
-// 			    if(uncScale)newE = correctedJet.Energy()/uncScale;
-// 			    newPt = beta*newE;
-// 			    newEta = correctedJet.Eta();
-// 			    newPhi = correctedJet.Phi();
-// 			    correctedJet.SetPtEtaPhiE(newPt,newEta,newPhi,newE);
 			    }
 			selectedjets.push_back(correctedJet);
 			selectedjetsBTag.push_back(jet.at(ijet)->BTag & (1 << 1)); //Medium WP
 			selectedjetsFlavor.push_back(jet.at(ijet)->Flavor);
 			deltaRljets = lepton_lv.DeltaR(correctedJet);
-			//deltaR_ljets.push_back(deltaRljets);
 			if(deltaRljets<minDR_lepJet){
 			  minDR_lepJet = deltaRljets;
 			  ptRel_lepJet = lepton_lv.P()*(correctedJet.Vect().Cross(lepton_lv.Vect()).Mag()/correctedJet.P()/lepton_lv.P());
@@ -493,7 +469,6 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		subLeadJetMass=selectedjets.at(1).M();
 		subLeadJetBTag=selectedjetsBTag.at(1);
 		
-		//Int_t NAK8jets = 0;
 		Ntoptagged = 0;
 		jetAK8Pt.clear();
 		jetAK8Eta.clear();
@@ -502,29 +477,30 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		jetAK8Tau32.clear();
 		jetAK8SDMass.clear();
 		jetAK8BTag.clear();
+		TLorentzVector ak8_p4;
 		for(size_t ijet=0;ijet<jetAK8.size();ijet++){
-			//NAK8jets++;
-			if(jetAK8.at(ijet)->PT < 400) continue;
-			if(fabs(jetAK8.at(ijet)->Eta) > 4) continue;
+			ak8_p4 = jetAK8.at(ijet)->P4();
+			if(ak8_p4.Pt() < 400) continue;
+			if(fabs(ak8_p4.Eta()) > 4) continue;
 			//if(jetAK8.at(ijet)->SoftDroppedJet.M() < 50) continue;
 			if(jetAK8.at(ijet)->SoftDroppedJet.M() < 105) continue;
 			if(jetAK8.at(ijet)->SoftDroppedJet.M() > 210) continue;
 			if(jetAK8.at(ijet)->Tau[2]/jetAK8.at(ijet)->Tau[1] > 0.65) continue;
-			if(lepton_lv.DeltaR(jetAK8.at(ijet)->P4())<0.8) continue;
+			if(lepton_lv.DeltaR(ak8_p4)<0.8) continue;
 			if(doJECup() || doJECdn()){
 			  	uncScale = 1;
-			  	Int_t binnum = htotJESbjets->GetXaxis()->FindBin(correctedJet.Pt());
-			  	if(correctedJet.Pt()>2999.99){binnum=htotJESbjets->GetSize()-2;}
-			  	if(jet.at(ijet)->Flavor==5){uncScale = htotJESbjets->GetBinContent(binnum);}
+			  	binnum = htotJESbjets->GetXaxis()->FindBin(ak8_p4.Pt());
+			  	if(ak8_p4.Pt()>2999.99){binnum=htotJESbjets->GetSize()-2;}
+			  	if(jetAK8.at(ijet)->Flavor==5){uncScale = htotJESbjets->GetBinContent(binnum);}
 			    else{uncScale = htotJESljets->GetBinContent(binnum);}
 			    if(doJECup()){uncScale = 1 + uncScale;}
 			    else if(doJECdn()){uncScale = 1 - uncScale;}
-			    correctedJet = correctedJet*uncScale;
+			    ak8_p4 = ak8_p4*uncScale;
 			    }
-			jetAK8Pt.push_back(jetAK8.at(ijet)->PT);
-			jetAK8Eta.push_back(jetAK8.at(ijet)->Eta);
-			jetAK8Phi.push_back(jetAK8.at(ijet)->Phi);
-			jetAK8Mass.push_back(jetAK8.at(ijet)->Mass);
+			jetAK8Pt.push_back(ak8_p4.Pt());
+			jetAK8Eta.push_back(ak8_p4.Eta());
+			jetAK8Phi.push_back(ak8_p4.Phi());
+			jetAK8Mass.push_back(ak8_p4.M());
 			jetAK8Tau32.push_back(jetAK8.at(ijet)->Tau[2]/jetAK8.at(ijet)->Tau[1]);
 			jetAK8SDMass.push_back(jetAK8.at(ijet)->SoftDroppedJet.M());
 			jetAK8BTag.push_back(jetAK8.at(ijet)->BTag);
