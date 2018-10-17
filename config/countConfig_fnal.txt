@@ -1,0 +1,20 @@
+[config-begin]
+
+    Outputdir  = output
+    Outputfile = outputfile_fnal.root
+    Lumi       = 3000  
+    Testmode   = false
+    Maxchilds  = 12
+    Samplesdir = root://cmseos.fnal.gov//store/user/snowmass/noreplica/YR_Delphes/
+    RunOnOutputOnly = false
+
+[config-end]
+
+
+
+[inputfiles-begin]
+
+Delphes342pre15/QCD_Pt-300to470_TuneCUETP8M1_14TeV_pythia8_200PU/, qcdpt300to470,  1, 1, auto, 1
+Delphes342pre15/QCD_Pt-800to1000_TuneCUETP8M1_14TeV_pythia8_200PU/, qcdpt800to1000,  1, 1, auto, 1
+
+[inputfiles-end]

@@ -92,7 +92,9 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	 * Histograms created this way are automatically added to the output file
 	 */
 // 	TH1* histo=addPlot(new TH1D("histoname1","histotitle1",100,0,100),"p_{T} [GeV]","N_{e}");
-
+	TFile *YRJECfile = TFile::Open("/afs/cern.ch/work/s/sisagir/private/DAnalysisFW/DAnalysis/DAnalysis_workdir/HL_YR_JEC.root");
+	TH1D * htotJESbjets = (TH1D*)YRJECfile->Get("TOTAL_BJES_AntiKt4EMTopo_YR2018");
+	TH1D * htotJESljets = (TH1D*)YRJECfile->Get("TOTAL_DIJET_AntiKt4EMTopo_YR2018");
 
 	/*
 	 * If (optionally) a skim or a flat ntuple is to be created, please use the following function to initialize
@@ -104,16 +106,25 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	 * Add a simple branch to the skim
 	 */
 	
-	Int_t isSignal = getSampleFile().Contains("RSGluonToTTbar_");
-	Int_t isTT  = getSampleFile().Contains("TT_TuneCUETP8M2") || getSampleFile().Contains("TT_Mtt");
-	Int_t isQCD = getSampleFile().Contains("QCD_Pt-") || getSampleFile().Contains("QCD_Mdijet-") || getSampleFile().Contains("QCD_Flat_");
+	//Bool_t doJECup = false;
+	//Bool_t doJECdn = false;
+	std::cout<<"doJECup="<<doJECup()<<std::endl;
+	std::cout<<"doJECdn="<<doJECdn()<<std::endl;
+	Bool_t isSignal = getSampleFile().Contains("RSGluonToTTbar_") || getSampleFile().Contains("ZPrimeToTTJets_") || getSampleFile().Contains("CMS_200PU_PhaseII");
+	Bool_t isTT  = getSampleFile().Contains("TT_TuneCUETP8M2") || getSampleFile().Contains("TT_Mtt") || getSampleFile().Contains("mg_pp_tt_");
+	Bool_t isQCD = getSampleFile().Contains("QCD_Pt-") || getSampleFile().Contains("QCD_Mdijet-") || getSampleFile().Contains("QCD_Flat_") || getSampleFile().Contains("mg_pp_jj_");
 	
+	Int_t eventNumber=-1;
+
 	Bool_t isSingEl=false;
 	Bool_t isSingMu=false;
 	
 	Double_t metPt =-999;
 	Double_t metEta=-999;
 	Double_t metPhi=-999;
+	Double_t metObjBasedPt =-999;
+	Double_t metObjBasedEta=-999;
+	Double_t metObjBasedPhi=-999;
 
 	Double_t lepPt =-999;
 	Double_t lepEta=-999;
@@ -125,12 +136,12 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	Double_t leadJetEta=-999;
 	Double_t leadJetPhi=-999;
 	Double_t leadJetMass=-999;
-	Int_t leadJetBTag=0;
+	Bool_t leadJetBTag=0;
 	Double_t subLeadJetPt=-999;
 	Double_t subLeadJetEta=-999;
 	Double_t subLeadJetPhi=-999;
 	Double_t subLeadJetMass=-999;
-	Int_t subLeadJetBTag=0;
+	Bool_t subLeadJetBTag=0;
 
 // 	std::vector<Double_t> jetPt;
 // 	std::vector<Double_t> jetEta;
@@ -143,7 +154,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	Double_t tlepLeadAK4Eta=-999;
 	Double_t tlepLeadAK4Phi=-999;
 	Double_t tlepLeadAK4Mass=-999;
-	Int_t tlepLeadAK4BTag=0;
+	Bool_t tlepLeadAK4BTag=0;
 	Int_t NJetsSel=0;
 	
 	Double_t minDR_lepJet=999;
@@ -179,7 +190,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	Double_t topAK8Mass=-999;
 	Double_t topAK8Tau32=-999;
 	Double_t topAK8SDMass=-999;
-	Int_t topAK8BTag=0;
+	Bool_t topAK8BTag=0;
 	Int_t Ntoptagged=0;
 	
 	Double_t zpPt=-999;
@@ -197,7 +208,9 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	std::vector<TLorentzVector> genParP4;
 	std::vector<Int_t> genParID;
 	Double_t genTTorJJMass=-999;
+	Double_t genTTorJJPt=-999;
 	
+	myskim->Branch("eventNumber", &eventNumber);
 	myskim->Branch("isSingEl", &isSingEl);
 	myskim->Branch("isSingMu", &isSingMu);
 	myskim->Branch("lepPt", &lepPt);
@@ -208,6 +221,9 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	myskim->Branch("metPt", &metPt);
 	myskim->Branch("metEta", &metEta);
 	myskim->Branch("metPhi", &metPhi);
+	myskim->Branch("metObjBasedPt", &metObjBasedPt);
+	myskim->Branch("metObjBasedEta", &metObjBasedEta);
+	myskim->Branch("metObjBasedPhi", &metObjBasedPhi);
 	myskim->Branch("leadJetPt", &leadJetPt);
 	myskim->Branch("leadJetEta", &leadJetEta);
 	myskim->Branch("leadJetPhi", &leadJetPhi);
@@ -260,11 +276,14 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 	//myskim->Branch("genzpPhi", &genzpPhi);
 	myskim->Branch("genzpMass", &genzpMass);
 	myskim->Branch("genTTorJJMass", &genTTorJJMass);
+	myskim->Branch("genTTorJJPt", &genTTorJJPt);
 	std::vector<TLorentzVector> selectedjets;
 	std::vector<Int_t> selectedjetsBTag;
+	std::vector<Int_t> selectedjetsFlavor;
 	//std::vector<Jet> overlapjets;
 	std::vector<TLorentzVector> tlep_jets;
 	std::vector<Int_t> tlep_jetsBTag;
+	std::vector<Int_t> tlep_jetsFlavor;
 	/*
 	 * Or store a vector of objects (also possible to store only one object)
 	 */
@@ -299,6 +318,9 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		 * Or to fill the skim
 		 */
 		//skimmedelecs.clear();
+		
+		eventNumber = event.at(0)->Number;
+		
 		Int_t Nels = 0;
 		Int_t elIdx = 0;
 		for(size_t iel=0;iel<elecs.size();iel++){
@@ -365,7 +387,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		ptRel_lepJet = -999;
 		float deltaRljets = 0;
 		TLorentzVector correctedJet;
-		TLorentzVector correctedMET;
+		TLorentzVector correctedMET,objBasedMET;
 // 		jetPt.clear();
 // 		jetEta.clear();
 // 		jetPhi.clear();
@@ -376,6 +398,15 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		selectedjetsBTag.clear();
 		float metPx=metPt*cos(metPhi);
 		float metPy=metPt*sin(metPhi);
+		float metObjBasedPx=-lepton_lv.Px();
+		float metObjBasedPy=-lepton_lv.Py();
+		
+		float uncScale = 1;
+// 		float beta = -999;
+// 		float newE = -999;
+// 		float newPt = -999;
+// 		float newEta = -999;
+// 		float newPhi = -999;
 		for(size_t ijet=0;ijet<jet.size();ijet++){
 			if(jet.at(ijet)->PT < 30) continue;
 			if(fabs(jet.at(ijet)->Eta) > 4) continue;
@@ -391,8 +422,26 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 			if(deltaRljets<0.4) correctedJet = correctedJet-lepton_lv;
 			if(correctedJet.Pt() < 30) continue;
 			if(fabs(correctedJet.Eta()) > 4) continue;
+			if(doJECup() || doJECdn()){
+			  	uncScale = 1;
+			  	Int_t binnum = htotJESbjets->GetXaxis()->FindBin(correctedJet.Pt());
+			  	if(correctedJet.Pt()>2999.99){binnum=htotJESbjets->GetSize()-2;}
+			  	if(jet.at(ijet)->Flavor==5){uncScale = htotJESbjets->GetBinContent(binnum);}
+			    else{uncScale = htotJESljets->GetBinContent(binnum);}
+			    if(doJECup()){uncScale = 1 + uncScale;}
+			    else if(doJECdn()){uncScale = 1 - uncScale;}
+			    correctedJet = correctedJet*uncScale;
+// 				beta = correctedJet.Pt()/correctedJet.Energy();
+// 			    newE = correctedJet.Energy();
+// 			    if(uncScale)newE = correctedJet.Energy()/uncScale;
+// 			    newPt = beta*newE;
+// 			    newEta = correctedJet.Eta();
+// 			    newPhi = correctedJet.Phi();
+// 			    correctedJet.SetPtEtaPhiE(newPt,newEta,newPhi,newE);
+			    }
 			selectedjets.push_back(correctedJet);
 			selectedjetsBTag.push_back(jet.at(ijet)->BTag & (1 << 1)); //Medium WP
+			selectedjetsFlavor.push_back(jet.at(ijet)->Flavor);
 			deltaRljets = lepton_lv.DeltaR(correctedJet);
 			//deltaR_ljets.push_back(deltaRljets);
 			if(deltaRljets<minDR_lepJet){
@@ -401,6 +450,8 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 			  }
 			metPx += jet.at(ijet)->P4().Px() - correctedJet.Px();
 			metPy += jet.at(ijet)->P4().Py() - correctedJet.Py();
+			metObjBasedPx=metObjBasedPx-correctedJet.Px();
+			metObjBasedPy=metObjBasedPy-correctedJet.Py();
             
             /*//Lepton-jet cleaning by removing jets which aren't separated by DR>0.4 from lepton
  			deltaRljets = lepton_lv.DeltaR(jet.at(ijet)->P4());
@@ -418,8 +469,13 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		metPt  = correctedMET.Pt();
 		metEta = correctedMET.Eta();
 		metPhi = correctedMET.Phi();
+		
+		objBasedMET.SetPxPyPzE(metObjBasedPx,metObjBasedPy,0,sqrt(metObjBasedPx*metObjBasedPx+metObjBasedPy*metObjBasedPy));
+		metObjBasedPt = objBasedMET.Pt();
+		metObjBasedEta = objBasedMET.Eta();
+		metObjBasedPhi = objBasedMET.Phi();
 
-		if(metPt<50) continue;
+		if(metPt<50 && metObjBasedPt<50) continue;
 		NpassMET++;
 		if(NJetsSel<2) continue;
 		if(selectedjets.at(0).Pt()<150) continue;
@@ -455,6 +511,16 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 			if(jetAK8.at(ijet)->SoftDroppedJet.M() > 210) continue;
 			if(jetAK8.at(ijet)->Tau[2]/jetAK8.at(ijet)->Tau[1] > 0.65) continue;
 			if(lepton_lv.DeltaR(jetAK8.at(ijet)->P4())<0.8) continue;
+			if(doJECup() || doJECdn()){
+			  	uncScale = 1;
+			  	Int_t binnum = htotJESbjets->GetXaxis()->FindBin(correctedJet.Pt());
+			  	if(correctedJet.Pt()>2999.99){binnum=htotJESbjets->GetSize()-2;}
+			  	if(jet.at(ijet)->Flavor==5){uncScale = htotJESbjets->GetBinContent(binnum);}
+			    else{uncScale = htotJESljets->GetBinContent(binnum);}
+			    if(doJECup()){uncScale = 1 + uncScale;}
+			    else if(doJECdn()){uncScale = 1 - uncScale;}
+			    correctedJet = correctedJet*uncScale;
+			    }
 			jetAK8Pt.push_back(jetAK8.at(ijet)->PT);
 			jetAK8Eta.push_back(jetAK8.at(ijet)->Eta);
 			jetAK8Phi.push_back(jetAK8.at(ijet)->Phi);
@@ -711,7 +777,7 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		genzpMass=-999;
 		if(isSignal){
 			for(unsigned int i=0;i<genpart.size();i++){
-				if (genpart.at(i)->PID==5100021){
+				if (genpart.at(i)->PID==5100021 || genpart.at(i)->PID==6000047){
 					//genzpPt=genpart.at(i)->PT;
 					//genzpEta=genpart.at(i)->Eta;
 					//genzpPhi=genpart.at(i)->Phi;
@@ -724,10 +790,9 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 		genParP4.clear();
 		genParID.clear();
 		genTTorJJMass=-999;
+		genTTorJJPt=-999;
 		if(isTT || isSignal){
-			//std::cout<<"////////////////////////////////////////////////////////////////////"<<std::endl;
 			for(unsigned int i=0;i<genpart.size();i++){
-				//std::cout<<"PID:"<<genpart.at(i)->PID<<" Status:"<<genpart.at(i)->Status<<std::endl;
 				if (fabs(genpart.at(i)->PID)==6 && genpart.at(i)->Status==22){ // "Status 22 : intermediate (intended to have preserved mass)" from http://home.thep.lu.se/~torbjorn/pythia81html/ParticleProperties.html
 					genParP4.push_back(genpart.at(i)->P4());
 					genParID.push_back(genpart.at(i)->PID);
@@ -736,15 +801,16 @@ void DAnalysis::analyze(size_t childid /* this info can be used for printouts */
 				}
 			if(genParID.size()!= 2){std::cout<<"WARNING::Found "<<genParID.size()<<" tops!!"<<std::endl;
 			}else if(genParID.at(0)*genParID.at(1) > 0){std::cout<<"WARNING::Found 2 tops with the same ID!!";
-			}else{genTTorJJMass=(genParP4.at(0)+genParP4.at(1)).M();}
+			}else{
+				genTTorJJMass=(genParP4.at(0)+genParP4.at(1)).M();
+				genTTorJJPt=(genParP4.at(0)+genParP4.at(1)).Pt();
+				}
 			}
 		
 		if(isQCD){
 			TLorentzVector genQCDP4;
 			genQCDP4.SetPtEtaPhiM(0.,0.,0.,0.);
-			//std::cout<<"////////////////////////////////////////////////////////////////////"<<std::endl;
 			for(unsigned int i=0;i<genpart.size();i++){
-				//std::cout<<"PID:"<<genpart.at(i)->PID<<" Status:"<<genpart.at(i)->Status<<std::endl;
 				if (genpart.at(i)->Status==23){ // "Status 23 : outgoing" from http://home.thep.lu.se/~torbjorn/pythia81html/ParticleProperties.html
 					genQCDP4+=genpart.at(i)->P4();
 					genParID.push_back(genpart.at(i)->PID);

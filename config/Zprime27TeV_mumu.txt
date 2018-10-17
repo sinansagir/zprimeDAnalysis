@@ -1,0 +1,19 @@
+[config-begin]
+
+    Outputdir  = output_27tev
+    Outputfile = outputfile_mumu.root
+    Lumi       = 3000  
+    Testmode   = false
+    Maxchilds  = 12
+    Samplesdir = root://cmseos.fnal.gov//store/user/wenyu/delphesout/DelphesFromLHE_201808/
+    RunOnOutputOnly = false
+
+[config-end]
+
+
+
+[inputfiles-begin]
+
+mg_pp_mumu_lo_200PU/, mumu,  1, 1, auto, 1
+
+[inputfiles-end]

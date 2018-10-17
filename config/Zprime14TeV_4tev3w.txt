@@ -1,0 +1,21 @@
+[config-begin]
+
+    Outputdir  = output_nominal
+    Outputfile = outputfile_4tev3w.root
+    Lumi       = 3000  
+    Testmode   = false
+    doJECup    = false
+    doJECdn    = false
+    Maxchilds  = 12
+    Samplesdir = root://cmseos.fnal.gov//store/user/snowmass/noreplica/YR_Delphes/Delphes342pre15/
+    RunOnOutputOnly = false
+
+[config-end]
+
+
+
+[inputfiles-begin]
+
+ZPrimeToTTJets_M_4000GeV_W120GeV_TuneCUETP8M1_14TeV-madgraph-pythia8_200PU/, 4tev3w,  1, 1, auto, 1
+
+[inputfiles-end]

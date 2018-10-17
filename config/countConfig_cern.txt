@@ -1,0 +1,21 @@
+[config-begin]
+
+    Outputdir  = output
+    Outputfile = outputfile_cern.root
+    Lumi       = 3000  
+    Testmode   = false
+    Maxchilds  = 12
+    Samplesdir = root://eoscms.cern.ch//store/group/upgrade/delphes_output/YR_Delphes/
+    RunOnOutputOnly = false
+
+[config-end]
+
+
+
+[inputfiles-begin]
+
+$Delphes342pre15/TT_TuneCUETP8M2T4_14TeV-powheg-pythia8_200PU/, ttinc,  1, 1, auto, 1
+
+Delphes342pre15/QCD_Pt-470to600_TuneCUETP8M1_14TeV_pythia8_200PU/, qcdpt470to600,  1, 1, auto, 1
+
+[inputfiles-end]

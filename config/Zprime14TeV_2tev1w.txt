@@ -1,0 +1,21 @@
+[config-begin]
+
+    Outputdir  = output_nominal
+    Outputfile = outputfile_2tev1w.root
+    Lumi       = 3000  
+    Testmode   = false
+    doJECup    = false
+    doJECdn    = false
+    Maxchilds  = 12
+    Samplesdir = root://eoscms.cern.ch//store/group/upgrade/delphes_output/YR_Delphes/Delphes342pre15/
+    RunOnOutputOnly = false
+
+[config-end]
+
+
+
+[inputfiles-begin]
+
+ZPrimeToTTJets_M_2000GeV_W20GeV_TuneCUETP8M1_14TeV-madgraph-pythia8_200PU/, 2tev1w,  1, 1, auto, 1
+
+[inputfiles-end]

@@ -1,9 +1,11 @@
 [config-begin]
 
-    Outputdir  = output
+    Outputdir  = output_nominal
     Outputfile = outputfile_qcdpt50to80.root
     Lumi       = 3000  
     Testmode   = false
+    doJECup    = false
+    doJECdn    = false
     Maxchilds  = 12
     Samplesdir = root://cms-xrd-global.cern.ch//store/group/upgrade/delphes_output/YR_Delphes/Delphes342pre15_hadd/QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU/
     RunOnOutputOnly = false
@@ -14,15 +16,15 @@
 
 [inputfiles-begin]
 
-QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_10.root,  qcdpt50to80,  1, 1,  auto, 1, true
-QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_1.root,  qcdpt50to80,  1, 1,  auto, 1, true
-QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_2.root,  qcdpt50to80,  1, 1,  auto, 1, true
-QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_3.root,  qcdpt50to80,  1, 1,  auto, 1, true
-QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_4.root,  qcdpt50to80,  1, 1,  auto, 1, true
-QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_5.root,  qcdpt50to80,  1, 1,  auto, 1, true
-QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_6.root,  qcdpt50to80,  1, 1,  auto, 1, true
-QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_7.root,  qcdpt50to80,  1, 1,  auto, 1, true
-QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_8.root,  qcdpt50to80,  1, 1,  auto, 1, true
-QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_9.root,  qcdpt50to80,  1, 1,  auto, 1, true
+QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_10.root,  qcdpt50to80,  1, 1,  auto, 1
+QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_1.root,  qcdpt50to80,  1, 1,  auto, 1
+QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_2.root,  qcdpt50to80,  1, 1,  auto, 1
+QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_3.root,  qcdpt50to80,  1, 1,  auto, 1
+QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_4.root,  qcdpt50to80,  1, 1,  auto, 1
+QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_5.root,  qcdpt50to80,  1, 1,  auto, 1
+QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_6.root,  qcdpt50to80,  1, 1,  auto, 1
+QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_7.root,  qcdpt50to80,  1, 1,  auto, 1
+QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_8.root,  qcdpt50to80,  1, 1,  auto, 1
+QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU_9.root,  qcdpt50to80,  1, 1,  auto, 1
 
 [inputfiles-end]

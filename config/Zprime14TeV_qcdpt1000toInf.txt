@@ -1,0 +1,23 @@
+[config-begin]
+
+    Outputdir  = output_nominal
+    Outputfile = outputfile_qcdpt1000toInf.root
+    Lumi       = 3000  
+    Testmode   = false
+    doJECup    = false
+    doJECdn    = false
+    Maxchilds  = 12
+    Samplesdir = root://cms-xrd-global.cern.ch//store/group/upgrade/delphes_output/YR_Delphes/Delphes342pre15_hadd/QCD_Pt-1000toInf_TuneCUETP8M1_14TeV_pythia8_200PU/
+    RunOnOutputOnly = false
+
+[config-end]
+
+
+
+[inputfiles-begin]
+
+QCD_Pt-1000toInf_TuneCUETP8M1_14TeV_pythia8_200PU_1.root,  qcdpt1000toInf,  1, 1,  auto, 1
+QCD_Pt-1000toInf_TuneCUETP8M1_14TeV_pythia8_200PU_2.root,  qcdpt1000toInf,  1, 1,  auto, 1
+QCD_Pt-1000toInf_TuneCUETP8M1_14TeV_pythia8_200PU_3.root,  qcdpt1000toInf,  1, 1,  auto, 1
+
+[inputfiles-end]

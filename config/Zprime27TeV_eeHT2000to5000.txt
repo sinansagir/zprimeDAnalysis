@@ -1,0 +1,19 @@
+[config-begin]
+
+    Outputdir  = output_27tev
+    Outputfile = outputfile_eeHT2000to5000.root
+    Lumi       = 3000  
+    Testmode   = false
+    Maxchilds  = 12
+    Samplesdir = root://cmseos.fnal.gov//store/user/wenyu/delphesout/DelphesFromLHE_201808/
+    RunOnOutputOnly = false
+
+[config-end]
+
+
+
+[inputfiles-begin]
+
+mg_pp_ee_5f_HT_2000_5000_200PU/, eeHT2000to5000,  1, 1, auto, 1
+
+[inputfiles-end]

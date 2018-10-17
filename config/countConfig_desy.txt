@@ -1,0 +1,50 @@
+[config-begin]
+
+    Outputdir  = output
+    Outputfile = outputfile_desy.root
+    Lumi       = 3000  
+    Testmode   = false
+    Maxchilds  = 12
+    Samplesdir = root://dcache-cms-xrootd.desy.de//pnfs/desy.de/cms/tier2/store/group/upgrade/delphes_output/YR_Delphes/
+    RunOnOutputOnly = false
+
+[config-end]
+
+
+
+[inputfiles-begin]
+
+$Delphes342pre15/RSGluonToTTbar_M2000_TuneCUEP8M1_14TeV_pythia8_200PU/, 2tev,  1, 1, auto, 1, true
+$Delphes342pre15_hadd/RSGluonToTTbar_M3000_TuneCUEP8M1_14TeV_pythia8_200PU/, 3tev,  1, 1, auto, 1, true
+$Delphes342pre15_hadd/RSGluonToTTbar_M4000_TuneCUEP8M1_14TeV_pythia8_200PU/RSGluonToTTbar_M4000_TuneCUEP8M1_14TeV_pythia8_200PU_1.root, 4tev,  1, 1, auto, 1, true
+$Delphes342pre15_hadd/RSGluonToTTbar_M4000_TuneCUEP8M1_14TeV_pythia8_200PU/RSGluonToTTbar_M4000_TuneCUEP8M1_14TeV_pythia8_200PU_2.root, 4tev,  1, 1, auto, 1, true
+$Delphes342pre15/RSGluonToTTbar_M5000_TuneCUEP8M1_14TeV_pythia8_200PU/, 5tev,  1, 1, auto, 1, true
+$Delphes342pre15/RSGluonToTTbar_M6000_TuneCUEP8M1_14TeV_pythia8_200PU/, 6tev,  1, 1, auto, 1, true
+
+$Delphes342pre14/QCD_Mdijet-1000toInf_TuneCUETP8M1_14TeV-pythia8_200PU/, qcd,  1, 1, auto, 1
+$Delphes342pre14/QCD_Flat_Pt-15to7000_TuneCUETP8M1_14TeV_pythia8_200PU/, qcdflat,  1, 1, auto, 1
+
+$Delphes342pre15_hadd/QCD_Pt-50to80_TuneCUETP8M1_14TeV_pythia8_200PU/, qcdpt50to80,  1, 1, auto, 1
+$Delphes342pre15_hadd/QCD_Pt-80to120_TuneCUETP8M1_14TeV_pythia8_200PU/, qcdpt80to120,  1, 1, auto, 1
+$Delphes342pre15_hadd/QCD_Pt-170to300_TuneCUETP8M1_14TeV_pythia8_200PU/, qcdpt170to300,  1, 1, auto, 1
+$Delphes342pre15_hadd/QCD_Pt-600to800_TuneCUETP8M1_14TeV_pythia8_200PU/, qcdpt600to800,  1, 1, auto, 1
+$Delphes342pre15_hadd/QCD_Pt-1000toInf_TuneCUETP8M1_14TeV_pythia8_200PU/, qcdpt1000toInf,  1, 1, auto, 1
+
+$Delphes342pre15/TT_Mtt1000toInf_TuneCUETP8M1_14TeV-powheg-pythia8_200PU/, ttbar,  1, 1, auto, 1
+
+Delphes342pre15_hadd/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU_10.root,  qcdpt120to170,  1, 1,  auto, 1
+Delphes342pre15_hadd/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU_11.root,  qcdpt120to170,  1, 1,  auto, 1
+Delphes342pre15_hadd/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU_12.root,  qcdpt120to170,  1, 1,  auto, 1
+Delphes342pre15_hadd/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU_13.root,  qcdpt120to170,  1, 1,  auto, 1
+Delphes342pre15_hadd/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU_14.root,  qcdpt120to170,  1, 1,  auto, 1
+Delphes342pre15_hadd/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU_1.root,  qcdpt120to170,  1, 1,  auto, 1
+Delphes342pre15_hadd/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU_2.root,  qcdpt120to170,  1, 1,  auto, 1
+Delphes342pre15_hadd/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU_3.root,  qcdpt120to170,  1, 1,  auto, 1
+Delphes342pre15_hadd/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU_4.root,  qcdpt120to170,  1, 1,  auto, 1
+Delphes342pre15_hadd/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU_5.root,  qcdpt120to170,  1, 1,  auto, 1
+Delphes342pre15_hadd/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU_6.root,  qcdpt120to170,  1, 1,  auto, 1
+Delphes342pre15_hadd/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU_7.root,  qcdpt120to170,  1, 1,  auto, 1
+Delphes342pre15_hadd/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU_8.root,  qcdpt120to170,  1, 1,  auto, 1
+Delphes342pre15_hadd/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU/QCD_Pt-120to170_TuneCUETP8M1_14TeV_pythia8_200PU_9.root,  qcdpt120to170,  1, 1,  auto, 1
+
+[inputfiles-end]

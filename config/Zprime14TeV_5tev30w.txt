@@ -1,0 +1,21 @@
+[config-begin]
+
+    Outputdir  = output_nominal
+    Outputfile = outputfile_5tev30w.root
+    Lumi       = 3000  
+    Testmode   = false
+    doJECup    = false
+    doJECdn    = false
+    Maxchilds  = 12
+    Samplesdir = root://dcache-cms-xrootd.desy.de//pnfs/desy.de/cms/tier2/store/group/upgrade/delphes_output/YR_Delphes/Delphes342pre14/
+    RunOnOutputOnly = false
+
+[config-end]
+
+
+
+[inputfiles-begin]
+
+ZPrimeToTTJets_M_5000GeV_W1500GeV_TuneCUETP8M1_14TeV-madgraph-pythia8_200PU/, 5tev30w,  1, 1, auto, 1
+
+[inputfiles-end]
